@@ -1,37 +1,37 @@
 'use strict';
-
+//  возвращает случайный элемент
 var getRandomElement = function (arr) {
   var max = arr.length;
   var randomElement = Math.round(Math.random() * (max - 1));
   return arr[randomElement];
 };
-
+//  возвращает случайный элемент из интервала
 var getRandomIntFromInterval = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
-var title = ['title1', 'title2', 'title3', 'title4', 'title5', 'title6', 'title7', 'title8'];
-var type = ['palace', 'flat', 'house', 'bungalo'];
-var minRooms = 1;
-var maxRooms = 3;
-var minGuests = 0;
-var maxGuests = 2;
-var checkin = ['12:00', '13:00', '14:00'];
-var checkout = ['12:00', '13:00', '14:00'];
-var minPrice = 0;
-var maxPrice = 1000000;
-var features = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-var description = ['description1', 'description2', 'description3', 'description4', 'description5', 'description6', 'description7', 'description8'];
-var photos = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
-//  var mapWidth = document.querySelector('.map__pins');
-//  var pin = document.querySelector('.map__pin--main');
-var minX = 300;
-var maxX = 500;
-//  var maxX = mapWidth.offsetWidth - pin.offsetWidth/2;
-var minY = 130;
-var maxY = 630;
-var quantity = 8;
+var TITLE = ['title1', 'title2', 'title3', 'title4', 'title5', 'title6', 'title7', 'title8'];
+var TYPE = ['palace', 'flat', 'house', 'bungalo'];
+var MIN_ROOMS = 1;
+var MAX_ROOMS = 3;
+var MIN_GUESTS = 0;
+var MAX_GUESTS = 2;
+var CHECKIN = ['12:00', '13:00', '14:00'];
+var CHECKOUT = ['12:00', '13:00', '14:00'];
+var MIN_PRICE = 0;
+var MAX_PRICE = 1000000;
+var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+var DESCRIPTION = ['description1', 'description2', 'description3', 'description4', 'description5', 'description6', 'description7', 'description8'];
+var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
+var PIN_WIDTH = 40;
+var PIN_HEIGHT = 44;
+var MIN_X = 320;
+var MAX_X = 1200;
+var MIN_Y = 130;
+var MAX_Y = 630;
+var QUANTITY = 8;
 
+//  возвращает новый случайный массив
 var getRandomArr = function (arrLength) {
   var newArr = [];
   var arrMin = 1;
@@ -45,47 +45,68 @@ var getRandomArr = function (arrLength) {
 var getArray = function () {
   var pins = [];
 
-  for (var i = 0; i < quantity; i++) {
+  for (var i = 0; i < QUANTITY; i++) {
     var author = {
-      avatar: 'img/avatars/user0' + getRandomIntFromInterval(1, 8) + '.png'
+      avatar: 'img/avatars/user0' + getRandomIntFromInterval(1, QUANTITY) + '.png'
     };
     var offer = {
-      title: getRandomElement(title),
-      address: getRandomIntFromInterval(minX, maxX) + ',' + '' + getRandomIntFromInterval(minY, maxY),
-      price: getRandomIntFromInterval(minPrice, maxPrice),
-      type: getRandomElement(type),
-      rooms: getRandomIntFromInterval(minRooms, maxRooms),
-      guests: getRandomIntFromInterval(minGuests, maxGuests),
-      checkin: getRandomElement(checkin),
-      checkout: getRandomElement(checkout),
-      features: getRandomArr(features),
-      description: getRandomElement(description),
-      photos: getRandomArr(photos)
+      title: getRandomElement(TITLE),
+      address: getRandomIntFromInterval(MIN_X, MAX_X) + ',' + '' + getRandomIntFromInterval(MIN_Y, MAX_Y),
+      price: getRandomIntFromInterval(MIN_PRICE, MAX_PRICE),
+      type: getRandomElement(TYPE),
+      rooms: getRandomIntFromInterval(MIN_ROOMS, MAX_ROOMS),
+      guests: getRandomIntFromInterval(MIN_GUESTS, MAX_GUESTS),
+      checkin: getRandomElement(CHECKIN),
+      checkout: getRandomElement(CHECKOUT),
+      features: getRandomArr(FEATURES),
+      description: getRandomElement(DESCRIPTION),
+      photos: getRandomArr(PHOTOS)
     };
     var location = {
-      x: getRandomIntFromInterval(300, 500),
-      y: getRandomIntFromInterval(130, 630)
+      x: getRandomIntFromInterval(MIN_X, MAX_X),
+      y: getRandomIntFromInterval(MIN_Y, MAX_Y)
     };
-    pins.push(author, offer, location[i]);
+
+    var pin = {
+      author: author,
+      offer: offer,
+      location: location
+    };
+    pins.push(pin);
   }
   return pins;
 };
 
-getArray(quantity);
-
 // переключение карты из неактивного состояния в активное
 var map = document.querySelector('.map');
 map.classList.remove('map--faded');
-// шаблон
-// var similarPinTemplate = document.querySelector('#pin')
-//     .content
-//     .querySelector('.map__pin');
 
-// var renderPins = function () {
-//   var pin = similarPinTemplate.cloneNode(true);
-//   pin.setAttribute('style', 'left: ' + pin.location.x + 'px; top: ' + pin.location.y + 'px;');
-//   pin.querySelector('img').src = pin.author.avatar;
-//   pin.querySelector('img').alt = pin.offer.title;
-//
-//   return pin;
-//   };
+//  нашли шаблон пинов, который будем копировать
+var similarPinTemplate = document.querySelector('#pin')
+    .content
+    .querySelector('.map__pin');
+
+//  создаем пин
+var renderPin = function (pin) {
+  var element = similarPinTemplate.cloneNode(true);
+  element.style = 'left: ' + (pin.location.x - PIN_WIDTH / 2) + 'px; top: ' + (pin.location.y - PIN_HEIGHT / 2) + 'px;';
+  // element.style.left = pin.location.x;
+  // element.style.top = pin.location.y;
+  element.querySelector('img').src = pin.author.avatar;
+  element.querySelector('img').alt = pin.offer.title;
+
+  return pin;
+};
+
+var mapTop = document.querySelector('.map__pins');
+
+var renderPins = function (pins) {
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < pins.length; i++) {
+    var element = renderPin(pins[i]);
+    fragment.appendChild(element);
+  }
+  mapTop.appendChild(fragment);
+};
+renderPins(QUANTITY);
+getArray(QUANTITY);
