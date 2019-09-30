@@ -75,6 +75,7 @@ var getArray = function () {
     pins.push(pin);
   }
   return pins;
+
 };
 
 // переключение карты из неактивного состояния в активное
@@ -89,7 +90,7 @@ var similarPinTemplate = document.querySelector('#pin')
 //  создаем пин
 var renderPin = function (pin) {
   var element = similarPinTemplate.cloneNode(true);
-  element.style = 'left: ' + (pin.location.x - PIN_WIDTH / 2) + 'px; top: ' + (pin.location.y - PIN_HEIGHT / 2) + 'px;';
+  element.style = 'left: ' + (pin.location.x - PIN_WIDTH / 2) + 'px; top: ' + (pin.location.y - PIN_HEIGHT) + 'px;';
   // element.style.left = pin.location.x;
   // element.style.top = pin.location.y;
   element.querySelector('img').src = pin.author.avatar;
@@ -100,6 +101,10 @@ var renderPin = function (pin) {
 
 var mapTop = document.querySelector('.map__pins');
 
+var pins = getArray();
+  //  console.log(pins);
+
+
 var renderPins = function (pins) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < pins.length; i++) {
@@ -108,5 +113,5 @@ var renderPins = function (pins) {
   }
   mapTop.appendChild(fragment);
 };
-renderPins(QUANTITY);
-getArray(QUANTITY);
+
+renderPins(pins);
