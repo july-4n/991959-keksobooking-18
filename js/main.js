@@ -101,8 +101,8 @@ var renderPin = function (pin) {
 
 var mapTop = document.querySelector('.map__pins');
 
-var pins = getArray();
-  //  console.log(pins);
+var pinsArr = getArray();
+//  console.log(pins);
 
 
 var renderPins = function (pins) {
@@ -114,4 +114,4 @@ var renderPins = function (pins) {
   mapTop.appendChild(fragment);
 };
 
-renderPins(pins);
+renderPins(pinsArr);
