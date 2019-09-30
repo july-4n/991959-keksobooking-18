@@ -96,7 +96,7 @@ var renderPin = function (pin) {
   element.querySelector('img').src = pin.author.avatar;
   element.querySelector('img').alt = pin.offer.title;
 
-  return pin;
+  return element;
 };
 
 var mapTop = document.querySelector('.map__pins');
