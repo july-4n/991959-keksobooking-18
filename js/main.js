@@ -1,6 +1,6 @@
 'use strict';
 //  возвращает случайный элемент
-var getRandomElement = function (arr) {
+var getRandomElements = function (arr) {
   var max = arr.length;
   var randomElement = Math.round(Math.random() * (max - 1));
   return arr[randomElement];
@@ -49,22 +49,22 @@ var getArray = function () {
     var author = {
       avatar: 'img/avatars/user0' + getRandomIntFromInterval(1, QUANTITY) + '.png'
     };
-    var offer = {
-      title: getRandomElement(TITLE),
-      address: getRandomIntFromInterval(MIN_X, MAX_X) + ',' + '' + getRandomIntFromInterval(MIN_Y, MAX_Y),
-      price: getRandomIntFromInterval(MIN_PRICE, MAX_PRICE),
-      type: getRandomElement(TYPE),
-      rooms: getRandomIntFromInterval(MIN_ROOMS, MAX_ROOMS),
-      guests: getRandomIntFromInterval(MIN_GUESTS, MAX_GUESTS),
-      checkin: getRandomElement(CHECKIN),
-      checkout: getRandomElement(CHECKOUT),
-      features: getRandomArr(FEATURES),
-      description: getRandomElement(DESCRIPTION),
-      photos: getRandomArr(PHOTOS)
-    };
     var location = {
       x: getRandomIntFromInterval(MIN_X, MAX_X),
       y: getRandomIntFromInterval(MIN_Y, MAX_Y)
+    };
+    var offer = {
+      title: getRandomElements(TITLE),
+      address: location.x + ', ' + location.y,
+      price: getRandomIntFromInterval(MIN_PRICE, MAX_PRICE),
+      type: getRandomElements(TYPE),
+      rooms: getRandomIntFromInterval(MIN_ROOMS, MAX_ROOMS),
+      guests: getRandomIntFromInterval(MIN_GUESTS, MAX_GUESTS),
+      checkin: getRandomElements(CHECKIN),
+      checkout: getRandomElements(CHECKOUT),
+      features: getRandomArr(FEATURES),
+      description: getRandomElements(DESCRIPTION),
+      photos: getRandomArr(PHOTOS)
     };
 
     var pin = {
@@ -90,7 +90,8 @@ var similarPinTemplate = document.querySelector('#pin')
 //  создаем пин
 var renderPin = function (pin) {
   var element = similarPinTemplate.cloneNode(true);
-  element.style = 'left: ' + (pin.location.x - PIN_WIDTH / 2) + 'px; top: ' + (pin.location.y - PIN_HEIGHT) + 'px;';
+  element.style.left = pin.location.x - PIN_WIDTH / 2 + 'px';
+  element.style.top = pin.location.y - PIN_HEIGHT + 'px';
   // element.style.left = pin.location.x;
   // element.style.top = pin.location.y;
   element.querySelector('img').src = pin.author.avatar;
