@@ -19,6 +19,7 @@ var MIN_X = 320;
 var MAX_X = 1200;
 var MIN_Y = 130;
 var MAX_Y = 630;
+var MIN_AVATAR_NUMBER =1;
 var QUANTITY = 8;
 
 //  возвращает случайное число из массива
@@ -47,7 +48,7 @@ var getArray = function () {
 
   for (var i = 0; i < QUANTITY; i++) {
     var author = {
-      avatar: 'img/avatars/user0' + getRandomIntFromInterval(1, QUANTITY) + '.png'
+      avatar: 'img/avatars/user0' + getRandomIntFromInterval(MIN_AVATAR_NUMBER, QUANTITY) + '.png'
     };
 
     var location = {
@@ -102,7 +103,6 @@ var renderPin = function (pin) {
 var mapTop = document.querySelector('.map__pins');
 
 var pinsArr = getArray();
-//  console.log(pins);
 
 var renderPins = function (pins) {
   var fragment = document.createDocumentFragment();
