@@ -19,7 +19,7 @@ var MIN_X = 320;
 var MAX_X = 1200;
 var MIN_Y = 130;
 var MAX_Y = 630;
-var MIN_AVATAR_NUMBER =1;
+var MIN_AVATAR_NUMBER = 1;
 var QUANTITY = 8;
 
 //  возвращает случайное число из массива
