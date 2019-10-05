@@ -1,14 +1,4 @@
 'use strict';
-//  возвращает случайный элемент
-var getRandomElements = function (arr) {
-  var max = arr.length;
-  var randomElement = Math.round(Math.random() * (max - 1));
-  return arr[randomElement];
-};
-//  возвращает случайный элемент из интервала
-var getRandomIntFromInterval = function (min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-};
 
 var TITLE = ['title1', 'title2', 'title3', 'title4', 'title5', 'title6', 'title7', 'title8'];
 var TYPE = ['palace', 'flat', 'house', 'bungalo'];
@@ -31,6 +21,16 @@ var MIN_Y = 130;
 var MAX_Y = 630;
 var QUANTITY = 8;
 
+//  возвращает случайное число из массива
+var getRandomElement = function (elements) {
+  var max = elements.length;
+  var randomIndex = Math.round(Math.random() * (max - 1));
+  return elements[randomIndex];
+};
+//  возвращает случайное число из интервала
+var getRandomIntFromInterval = function (min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+};
 //  возвращает новый случайный массив
 var getRandomArr = function (arrLength) {
   var newArr = [];
@@ -49,21 +49,23 @@ var getArray = function () {
     var author = {
       avatar: 'img/avatars/user0' + getRandomIntFromInterval(1, QUANTITY) + '.png'
     };
+
     var location = {
       x: getRandomIntFromInterval(MIN_X, MAX_X),
       y: getRandomIntFromInterval(MIN_Y, MAX_Y)
     };
+
     var offer = {
-      title: getRandomElements(TITLE),
+      title: getRandomElement(TITLE),
       address: location.x + ', ' + location.y,
       price: getRandomIntFromInterval(MIN_PRICE, MAX_PRICE),
-      type: getRandomElements(TYPE),
+      type: getRandomElement(TYPE),
       rooms: getRandomIntFromInterval(MIN_ROOMS, MAX_ROOMS),
       guests: getRandomIntFromInterval(MIN_GUESTS, MAX_GUESTS),
-      checkin: getRandomElements(CHECKIN),
-      checkout: getRandomElements(CHECKOUT),
+      checkin: getRandomElement(CHECKIN),
+      checkout: getRandomElement(CHECKOUT),
       features: getRandomArr(FEATURES),
-      description: getRandomElements(DESCRIPTION),
+      description: getRandomElement(DESCRIPTION),
       photos: getRandomArr(PHOTOS)
     };
 
@@ -75,7 +77,6 @@ var getArray = function () {
     pins.push(pin);
   }
   return pins;
-
 };
 
 // переключение карты из неактивного состояния в активное
@@ -92,8 +93,6 @@ var renderPin = function (pin) {
   var element = similarPinTemplate.cloneNode(true);
   element.style.left = pin.location.x - PIN_WIDTH / 2 + 'px';
   element.style.top = pin.location.y - PIN_HEIGHT + 'px';
-  // element.style.left = pin.location.x;
-  // element.style.top = pin.location.y;
   element.querySelector('img').src = pin.author.avatar;
   element.querySelector('img').alt = pin.offer.title;
 
@@ -104,7 +103,6 @@ var mapTop = document.querySelector('.map__pins');
 
 var pinsArr = getArray();
 //  console.log(pins);
-
 
 var renderPins = function (pins) {
   var fragment = document.createDocumentFragment();
