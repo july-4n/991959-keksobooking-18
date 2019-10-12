@@ -99,6 +99,7 @@ var renderPin = function (pin) {
 
   return element;
 };
+
 // Находит элемент, в который мы будем вставлять похожие объявления
 var mapTop = document.querySelector('.map__pins');
 
@@ -127,26 +128,7 @@ var element = {
   palace: 'Дворец'
 };
 
-//   var key = 'house'
-// element[key]
-//   console.log(element[key]);
-
-//  отрисовка модального окна с объявлением
-var renderCardElement = function (cardElement, pin) {
-
-  cardElement.querySelector('.popup__title').textContent = pin.offer.title;
-  cardElement.querySelector('.popup__text--address').textContent = pin.offer.address;
-  cardElement.querySelector('.popup__text--price').textContent = pin.offer.price + '₽/ночь';
-  cardElement.querySelector('.popup__type').textContent = element[pin.offer.type];
-  cardElement.querySelector('.popup__text--capacity').textContent = pin.offer.rooms + ' комнаты для' + pin.offer.guests + ' гостей';
-  cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + pin.offer.checkin + 'выезд до ' + pin.offer.checkout;
-  cardElement.querySelector('.popup__features').textContent = pin.offer.features;
-  cardElement.querySelector('.popup__description').textContent = pin.offer.description;
-  cardElement.querySelector('.popup__avatar').src = pin.author.avatar;
-
-  return cardElement;
-};
-
+//  функция для отрисовки фотографий
 var renderPhotos = function (cardElement, pin) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < pin.offer.photos.length; i++) {
@@ -160,7 +142,23 @@ var renderPhotos = function (cardElement, pin) {
   }
   cardElement.appendChild(fragment);
 };
-//  var mapFiltersContainer = document.querySelector('.map__filters-container');
+
+//  отрисовка модального окна с объявлением
+var renderCardElement = function (cardElement, pin) {
+
+  cardElement.querySelector('.popup__title').textContent = pin.offer.title;
+  cardElement.querySelector('.popup__text--address').textContent = pin.offer.address;
+  cardElement.querySelector('.popup__text--price').textContent = pin.offer.price + '₽/ночь';
+  cardElement.querySelector('.popup__type').textContent = element[pin.offer.type];
+  cardElement.querySelector('.popup__text--capacity').textContent = pin.offer.rooms + ' комнаты для ' + pin.offer.guests + ' гостей';
+  cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + pin.offer.checkin + ', выезд до ' + pin.offer.checkout;
+  cardElement.querySelector('.popup__features').textContent = pin.offer.features;
+  cardElement.querySelector('.popup__description').textContent = pin.offer.description;
+  cardElement.querySelector('.popup__avatar').src = pin.author.avatar;
+  cardElement.querySelector('.popup__photos').src = renderPhotos(cardElement, pin);
+  return cardElement;
+};
+
+var mapFiltersContainer = document.querySelector('.map__filters-container');
 var cardElement = cardTemplate.cloneNode(true);
-mapTop.appendChild(renderCardElement(cardElement, pinsArr[0]));
-mapTop.appendChild(renderPhotos(cardElement, pinsArr[0]));
+map.insertBefore(renderCardElement(cardElement, pinsArr[0]), mapFiltersContainer);
