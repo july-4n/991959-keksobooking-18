@@ -13,14 +13,18 @@ var MAX_PRICE = 1000000;
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var DESCRIPTION = ['description1', 'description2', 'description3', 'description4', 'description5', 'description6', 'description7', 'description8'];
 var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
-var PIN_WIDTH = 40;
-var PIN_HEIGHT = 44;
+var PIN_WIDTH = 62;
+var PIN_HEIGHT = 62;
 var MIN_X = 320;
 var MAX_X = 1200;
 var MIN_Y = 130;
 var MAX_Y = 630;
 var MIN_AVATAR_NUMBER = 1;
 var QUANTITY = 8;
+var ENTER_KEYCODE = 13;
+var LOCATION_X_PIN = 570;
+var LOCATION_Y_PIN = 375;
+// var PIN_HEIGHT_POINTER = 22;
 
 //  возвращает случайное число из массива
 var getRandomElement = function (elements) {
@@ -82,7 +86,7 @@ var getArray = function () {
 
 // переключение карты из неактивного состояния в активное
 var map = document.querySelector('.map');
-map.classList.remove('map--faded');
+// map.classList.remove('map--faded');
 
 //  нашли шаблон пинов, который будем копировать
 var similarPinTemplate = document.querySelector('#pin')
@@ -144,8 +148,8 @@ var renderPhotos = function (cardElement, pin) {
 };
 
 //  отрисовка модального окна с объявлением
-var renderCardElement = function (cardElement, pin) {
-
+var renderCardElement = function (pin) {
+  var cardElement = cardTemplate.cloneNode(true);
   cardElement.querySelector('.popup__title').textContent = pin.offer.title;
   cardElement.querySelector('.popup__text--address').textContent = pin.offer.address;
   cardElement.querySelector('.popup__text--price').textContent = pin.offer.price + '₽/ночь';
@@ -160,5 +164,60 @@ var renderCardElement = function (cardElement, pin) {
 };
 
 var mapFiltersContainer = document.querySelector('.map__filters-container');
-var cardElement = cardTemplate.cloneNode(true);
-map.insertBefore(renderCardElement(cardElement, pinsArr[0]), mapFiltersContainer);
+map.insertBefore(renderCardElement(pinsArr[0]), mapFiltersContainer);
+
+var mapFilters = document.querySelector('.map__filters');
+var adForm = document.querySelector('.ad-form');
+
+//  добавляем/убираем атрибут disabled в форму
+var adFormDisabled = function (elem, isDisabled) {
+  var children = elem.querySelectorAll('fieldset');
+  for (var i = 0; i < children.length; i++) {
+    children[i].disabled = isDisabled;
+  }
+};
+//  Все <input> и <select> формы .ad-form заблокированы с помощью атрибута disabled, добавленного на их родительские блоки fieldset;
+adFormDisabled(adForm, true);
+
+//  Форма с фильтрами .map__filters заблокирована так же, как и форма .ad-form;
+mapFilters.classList.add('map__filters--disabled');
+
+//  Функция активации страницы
+var adFormActivation = function () {
+  adFormDisabled(adForm, false);
+  adForm.classList.remove('ad-form--disabled');
+  mapFilters.classList.remove('map__filters--disabled');
+};
+
+var mapPinMain = document.querySelector('.map__pin--main');
+
+// Обработчик активации страницы по клику
+mapPinMain.addEventListener('mousedown', function () {
+  adFormActivation();
+});
+
+//  Обработчик активации страницы по нажатию на Enter
+mapPinMain.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    adFormActivation();
+  }
+});
+
+// Координаты пина, при неактивном состоянии
+document.querySelector('#address').value = LOCATION_X_PIN + PIN_WIDTH / 2 + ', ' + LOCATION_Y_PIN + PIN_HEIGHT / 2;
+
+//  Валидация
+// var guestsValue = document.querySelector('[name="capacity"]');
+// var roomsValue = document.querySelector('[name="rooms"]');
+var guestsValue = document.querySelector('#capacity').value;
+var roomsValue = document.querySelector('#room_number').value;
+var adFormSubmit = document.querySelector('.ad-form__submit');
+
+adFormSubmit.addEventListener('mosedown', function () {
+  if (roomsValue < guestsValue) {
+    adFormSubmit.validity.valid = false;
+    if (!adFormSubmit.validity.valid) {
+      adFormSubmit.setCustomValidity('Количество гостей больше, чем количество комнат');
+    }
+  }
+});
