@@ -185,14 +185,15 @@ var disableElements = function (children, isDisabled) {
     children[i].disabled = isDisabled;
   }
 };
+
 //  добавляем/убираем атрибут disabled в форму
 var adFormDisabled = function (elem, isDisabled) {
   var fieldsets = elem.querySelectorAll('fieldset');
   var selects = elem.querySelectorAll('select');
   var buttons = elem.querySelectorAll('button');
-  disableElements(fieldsets);
-  disableElements(selects);
-  disableElements(buttons);
+  disableElements(fieldsets, isDisabled);
+  disableElements(selects, isDisabled);
+  disableElements(buttons, isDisabled);
   address.value = addressPassive();
 };
 //  Все <input> и <select> формы .ad-form заблокированы с помощью атрибута disabled, добавленного на их родительские блоки fieldset;
@@ -237,12 +238,10 @@ adFormSubmit.addEventListener('click', function () {
   var roomsNumber = roomsValue.value;
   if (roomsNumber === '100' && guestsNumber !== '0') {
     guestsValue.setCustomValidity(ErrorText.NOT_GUESTS);
-  }
-  else if (guestsNumber === '0' && roomsNumber !== '100') {
+  } else if (guestsNumber === '0' && roomsNumber !== '100') {
     guestsValue.setCustomValidity(ErrorText.VALUE_GUESTS);
-  }
-  else if (roomsNumber < guestsNumber) {
-  guestsValue.setCustomValidity(ErrorText.GUESTS);
+  } else if (roomsNumber < guestsNumber) {
+    guestsValue.setCustomValidity(ErrorText.GUESTS);
   } else {
     guestsValue.setCustomValidity('');
   }
