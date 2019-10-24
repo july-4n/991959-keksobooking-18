@@ -199,10 +199,6 @@ var adFormDisabled = function (elem, isDisabled) {
 //  Все <input> и <select> формы .ad-form заблокированы с помощью атрибута disabled, добавленного на их родительские блоки fieldset;
 adFormDisabled(adForm, true);
 
-
-//  Форма с фильтрами .map__filters заблокирована так же, как и форма .ad-form;
-mapFilters.classList.add('map__filters--disabled');
-
 //  Функция активации страницы
 var adFormActivation = function () {
   adFormDisabled(adForm, false);
