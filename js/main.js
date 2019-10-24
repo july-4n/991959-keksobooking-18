@@ -25,6 +25,11 @@ var ENTER_KEYCODE = 13;
 var LOCATION_X_PIN = 570;
 var LOCATION_Y_PIN = 375;
 var PIN_HEIGHT_POINTER = 22;
+var ErrorText = {
+  GUESTS: 'Количество гостей должно быть меньше или равно количеству комнат',
+  NOT_GUESTS: 'Такие большие помещения не для гостей',
+  VALUE_GUESTS: 'Укажите количество гостей'
+};
 
 //  возвращает случайное число из массива
 var getRandomElement = function (elements) {
@@ -161,14 +166,34 @@ var map = document.querySelector('.map');
 var mapFiltersContainer = document.querySelector('.map__filters-container');
 var mapFilters = document.querySelector('.map__filters');
 var adForm = document.querySelector('.ad-form');
+var address = document.querySelector('#address');
 
-//  добавляем/убираем атрибут disabled в форму
-var adFormDisabled = function (elem, isDisabled) {
-  var children = elem.querySelectorAll('fieldset');
+//  определение адреса
+var addressPassive = function () {
+  var addressValue = (LOCATION_X_PIN + PIN_WIDTH / 2) + ', ' + (LOCATION_Y_PIN + PIN_HEIGHT / 2);
+  return addressValue;
+};
+
+//  определение адреса при активации
+var addressActive = function () {
+  var addressValue = (LOCATION_X_PIN + PIN_WIDTH / 2) + ', ' + (LOCATION_Y_PIN + (PIN_HEIGHT + PIN_HEIGHT_POINTER) / 2);
+  return addressValue;
+};
+
+var disableElements = function (children, isDisabled) {
   for (var i = 0; i < children.length; i++) {
     children[i].disabled = isDisabled;
-    document.querySelector('#address').value = (LOCATION_X_PIN + PIN_WIDTH / 2) + ', ' + (LOCATION_Y_PIN + PIN_HEIGHT / 2);
   }
+};
+//  добавляем/убираем атрибут disabled в форму
+var adFormDisabled = function (elem, isDisabled) {
+  var fieldsets = elem.querySelectorAll('fieldset');
+  var selects = elem.querySelectorAll('select');
+  var buttons = elem.querySelectorAll('button');
+  disableElements(fieldsets);
+  disableElements(selects);
+  disableElements(buttons);
+  address.value = addressPassive();
 };
 //  Все <input> и <select> формы .ad-form заблокированы с помощью атрибута disabled, добавленного на их родительские блоки fieldset;
 adFormDisabled(adForm, true);
@@ -192,7 +217,7 @@ var mapPinMain = document.querySelector('.map__pin--main');
 mapPinMain.addEventListener('mousedown', function () {
   adFormActivation();
   map.classList.remove('map--faded');
-  document.querySelector('#address').value = (LOCATION_X_PIN + PIN_WIDTH / 2) + ', ' + (LOCATION_Y_PIN + (PIN_HEIGHT + PIN_HEIGHT_POINTER) / 2);
+  address.value = addressActive();
 });
 
 //  Обработчик активации страницы по нажатию на Enter
@@ -203,17 +228,22 @@ mapPinMain.addEventListener('keydown', function (evt) {
 });
 
 //  Валидация
-// var guestsValue = document.querySelector('[name="capacity"]');
-// var roomsValue = document.querySelector('[name="rooms"]');
-var guestsValue = document.querySelector('#capacity').value;
-var roomsValue = document.querySelector('#room_number').value;
+var guestsValue = document.querySelector('#capacity');
+var roomsValue = document.querySelector('#room_number');
 var adFormSubmit = document.querySelector('.ad-form__submit');
 
-adFormSubmit.addEventListener('mosedown', function () {
-  if (roomsValue < guestsValue) {
-    adFormSubmit.validity.valid = false;
-    if (!adFormSubmit.validity.valid) {
-      adFormSubmit.setCustomValidity('Количество гостей больше, чем количество комнат');
-    }
+adFormSubmit.addEventListener('click', function () {
+  var guestsNumber = guestsValue.value;
+  var roomsNumber = roomsValue.value;
+  if (roomsNumber === '100' && guestsNumber !== '0') {
+    guestsValue.setCustomValidity(ErrorText.NOT_GUESTS);
+  }
+  else if (guestsNumber === '0' && roomsNumber !== '100') {
+    guestsValue.setCustomValidity(ErrorText.VALUE_GUESTS);
+  }
+  else if (roomsNumber < guestsNumber) {
+  guestsValue.setCustomValidity(ErrorText.GUESTS);
+  } else {
+    guestsValue.setCustomValidity('');
   }
 });
