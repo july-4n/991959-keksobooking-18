@@ -2,7 +2,7 @@
 
 (function () {
 
-  window.map = document.querySelector('.map');
+
   var mapFiltersContainer = document.querySelector('.map__filters-container');
   var mapFilters = document.querySelector('.map__filters');
   var adForm = document.querySelector('.ad-form');
@@ -46,7 +46,7 @@
     adFormDisabled(mapFiltersContainer, false);
     adForm.classList.remove('ad-form--disabled');
     mapFilters.classList.remove('map__filters--disabled');
-    window.renderPins(window.pin.pinsArr);
+    window.map.renderPins(window.pin.pinsArr);
   };
 
   var mapPinMain = document.querySelector('.map__pin--main');
@@ -54,7 +54,7 @@
   // Обработчик активации страницы по клику
   mapPinMain.addEventListener('mousedown', function () {
     adFormActivation();
-    window.map.classList.remove('map--faded');
+    window.map.element.classList.remove('map--faded');
     address.value = addressActive();
   });
 
