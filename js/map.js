@@ -1,59 +1,52 @@
 'use strict';
 
 (function () {
+  var map = document.querySelector('.map');
+  var renderedCard;
 
-  // Обработчик нажатия на пин
+  var removeCard = function () {
+  // Карточку берем из замыкания модуля
+  // Если ее нет, то ничего не делать
+    if (!renderedCard) {
+      return;
+    }
+    // Удаляем карточку
+    map.removeChild(renderedCard);
+    renderedCard = null;
+
+    // Снимаем обработчик с document
+    document.removeEventListener('keyup', onDocumentKeyupPopup);
+  };
+  var onDocumentKeyupPopup = function (evt) {
+    if (evt.keyCode === window.ESC_KEYCODE) {
+      removeCard();
+    }
+  };
+
+  // Функция создания обработчика на пин
   function createClickPinHandler(index) {
 
     //  Обработка нажатия на пин
     var clickPinHandler = function () {
       var pin = window.pin.pinsArr[index];
-      var child = window.card.renderCardElement(pin);
-      var oldChild = window.map.lastChild;
 
-      var popupCheck = function () {
-        var popupClose = document.querySelector('.popup__close');
-        return popupClose;
-      };
+      removeCard();
 
-      //  проверяем наличие popup чтобы убедиться, что окно открыто
-      //  если popupClose существует, т.е. не равен null - делаем замену
-      if (popupCheck() !== null) {
-        window.map.replaceChild(child, oldChild);
-      } else {
-      //  если popupClose не существует, т.е. равен null - делаем добавление
-        window.map.appendChild(child);
-      }
+      renderedCard = window.card.renderCardElement(pin);
+        map.appendChild(renderedCard);
+
+      var closeButton = renderedCard.querySelector('.popup__close');
 
       // по клику на крестик
-      popupCheck().addEventListener('click', function () {
+      closeButton.addEventListener('click', function () {
         removeCard();
-        //  window.map.removeChild(child);
       });
-
-      var onDocumentKeyupPopup = function (evt) {
-        if (evt.keyCode === window.ESC_KEYCODE) {
-          removeCard();
-        }
-      };
-
-      var removeCard = function () {
-      // Карточку берем из замыкания модуля
-      // Если ее нет, то ничего не делать
-        if (!child) {
-          return;
-        }
-        // Удаляем карточку
-        window.map.removeChild(child);
-        // Снимаем обработчик с document
-        document.removeEventListener('keyup', onDocumentKeyupPopup);
-      };
       document.addEventListener('keyup', onDocumentKeyupPopup);
     };
     return clickPinHandler;
-  }
+}
 
-  window.renderPins = function (pins) {
+  var renderPins = function (pins) {
     var fragment = document.createDocumentFragment();
     for (var i = 0; i < pins.length; i++) {
       var pin = pins[i];
@@ -66,5 +59,12 @@
       fragment.appendChild(element);
     }
     window.card.mapTop.appendChild(fragment);
+
   };
+
+
+  window.map = {
+    element: map,
+    renderPins: renderPins
+  }
 })();
