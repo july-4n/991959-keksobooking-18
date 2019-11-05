@@ -2,9 +2,6 @@
 
 (function () {
 
-  // Находит элемент, в который мы будем вставлять похожие объявления
-  window.card.mapTop = document.querySelector('.map__pins');
-
   var cardTemplate = document.querySelector('#card')
     .content
     .querySelector('.popup');
@@ -33,7 +30,7 @@
   };
 
   //  Отрисовка модального окна с объявлением
-  window.card.renderCardElement = function (pin) {
+  var renderCardElement = function (pin) {
     var cardElement = cardTemplate.cloneNode(true);
     cardElement.querySelector('.popup__title').textContent = pin.offer.title;
     cardElement.querySelector('.popup__text--address').textContent = pin.offer.address;
@@ -46,5 +43,9 @@
     cardElement.querySelector('.popup__avatar').src = pin.author.avatar;
     cardElement.querySelector('.popup__photos').src = renderPhotos(cardElement, pin);
     return cardElement;
+  };
+
+  window.card = {
+    renderCardElement: renderCardElement
   };
 })();
