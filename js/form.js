@@ -12,10 +12,10 @@
   var PIN_HEIGHT = 62;
   var PIN_HEIGHT_POINTER = 22;
   var ENTER_KEYCODE = 13;
-  // var X_MIN = 0;
-  // var X_MAX = 1200;
-  // var Y_MIN = 130;
-  // var Y_MAX = 630;
+  var X_MIN = 0;
+  var X_MAX = 1200;
+  var Y_MIN = 130;
+  var Y_MAX = 630;
   var ErrorText = {
     GUESTS: 'Количество гостей должно быть меньше или равно количеству комнат',
     NOT_GUESTS: 'Такие большие помещения не для гостей',
@@ -25,15 +25,9 @@
     PALACE_MIN_PRICE: 'Минимальная цена за ночь для дворца - 10000 руб.'
   };
 
-  //  Определение адреса
-  var addressPassive = function () {
-    var addressValue = (LOCATION_X_PIN + PIN_WIDTH / 2) + ', ' + (LOCATION_Y_PIN + PIN_HEIGHT / 2);
-    return addressValue;
-  };
-
-  //  Определение адреса при активации
-  var addressActive = function () {
-    var addressValue = (LOCATION_X_PIN + PIN_WIDTH / 2) + ', ' + (LOCATION_Y_PIN + (PIN_HEIGHT + PIN_HEIGHT_POINTER) / 2);
+  //  Функция заполнения поля адреса
+  var addressField = function (pinX, pinY) {
+    var addressValue = pinX + ', ' + pinY;
     return addressValue;
   };
 
@@ -51,7 +45,9 @@
     disableElements(fieldsets, isDisabled);
     disableElements(selects, isDisabled);
     disableElements(buttons, isDisabled);
-    address.value = addressPassive();
+    if (isDisabled) {
+      address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN - PIN_HEIGHT / 2));
+    }
   };
 
   adFormDisabled(adForm, true);
@@ -67,12 +63,13 @@
   };
 
   var mapPinMain = document.querySelector('.map__pin--main');
+  var mapOverlay = document.querySelector('.map__overlay');
 
   // Обработчик активации страницы по клику
+
   mapPinMain.addEventListener('mousedown', function () {
     adFormActivation();
     window.map.element.classList.remove('map--faded');
-    address.value = addressActive();
   });
 
   //  Обработчик активации страницы по нажатию на Enter
@@ -109,26 +106,34 @@
         y: moveEvt.clientY,
       };
 
-      pinCoords = {
-        x: mapPinMain.offsetLeft - shift.x,
-        y: mapPinMain.offsetTop - shift.y
+      //  функция расчета координат пина
+      var coordsPin = function () {
+        pinCoords = {
+          x: mapPinMain.offsetLeft - shift.x,
+          y: mapPinMain.offsetTop - shift.y
+        };
       };
+      coordsPin();
 
       //  Ограничения размеров
-      // if ((pinCoords.x < X_MIN) || (pinCoords.x > X_MAX)) {
-      //   pinCoords.x = mapPinMain.offsetLeft;
-      // }
-      // if ((pinCoords.y + (PIN_HEIGHT + PIN_HEIGHT_POINTER) / 2) < Y_MIN) || (pinCoords.y + (PIN_HEIGHT + PIN_HEIGHT_POINTER) / 2) > Y_MAX)) {
-      //   pinCoords.y = mapPinMain.offsetTop;
-      // }
-
-      mapPinMain.style.left = (pinCoords.x - shift.x) + 'px';
-      mapPinMain.style.top = (pinCoords.y - shift.y) + 'px';
+      if (pinCoords.x < X_MIN - PIN_WIDTH / 2) {
+        pinCoords.x = mapOverlay.offsetLeft - PIN_WIDTH / 2;
+      } else if (pinCoords.x > X_MAX - PIN_WIDTH / 2) {
+        pinCoords.x = mapOverlay.offsetLeft + X_MAX - PIN_WIDTH / 2;
+      }
+      if (pinCoords.y < Y_MIN - PIN_HEIGHT * 2) {
+        pinCoords.y = mapOverlay.offsetTop;
+      } else if (pinCoords.y > Y_MAX) {
+        pinCoords.y = mapOverlay.offsetTop + Y_MAX;
+      }
+      mapPinMain.style.left = (pinCoords.x) + 'px';
+      mapPinMain.style.top = (pinCoords.y) + 'px';
     };
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
-
+      //  Изменение поля адреса при отпускании кнопки мыши
+      address.value = addressField(pinCoords.x, pinCoords.y + PIN_HEIGHT / 2 + PIN_HEIGHT_POINTER);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     };
@@ -151,7 +156,6 @@
     var roomsNumber = roomsValue.value;
     var inputPrice = inputPriceValue.value;
     var inputType = inputTypeValue.value;
-
 
     if (roomsNumber === '100' && guestsNumber !== '0') {
       guestsValue.setCustomValidity(ErrorText.NOT_GUESTS);
