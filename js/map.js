@@ -1,7 +1,12 @@
 'use strict';
 
 (function () {
+
+  var ESC_KEYCODE = 27;
+
   var map = document.querySelector('.map');
+  // Находит элемент, в который мы будем вставлять похожие объявления
+  var mapTop = document.querySelector('.map__pins');
   var renderedCard;
 
   var removeCard = function () {
@@ -18,7 +23,7 @@
     document.removeEventListener('keyup', onDocumentKeyupPopup);
   };
   var onDocumentKeyupPopup = function (evt) {
-    if (evt.keyCode === window.ESC_KEYCODE) {
+    if (evt.keyCode === ESC_KEYCODE) {
       removeCard();
     }
   };
@@ -33,7 +38,7 @@
       removeCard();
 
       renderedCard = window.card.renderCardElement(pin);
-        map.appendChild(renderedCard);
+      map.appendChild(renderedCard);
 
       var closeButton = renderedCard.querySelector('.popup__close');
 
@@ -44,7 +49,7 @@
       document.addEventListener('keyup', onDocumentKeyupPopup);
     };
     return clickPinHandler;
-}
+  }
 
   var renderPins = function (pins) {
     var fragment = document.createDocumentFragment();
@@ -58,13 +63,13 @@
       element.appendChild(renderedPin);
       fragment.appendChild(element);
     }
-    window.card.mapTop.appendChild(fragment);
+    mapTop.appendChild(fragment);
 
   };
 
-
   window.map = {
     element: map,
+    mapTop: mapTop,
     renderPins: renderPins
-  }
+  };
 })();
