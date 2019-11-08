@@ -59,7 +59,6 @@
     return pins;
   };
 
-
   //  нашли шаблон пинов, который будем копировать
   var similarPinTemplate = document.querySelector('#pin')
       .content
@@ -76,9 +75,34 @@
     return element;
   };
 
-  var pinsArr = getArray();
+  var successHandler = function (pinsArrayFromResponse) {
+    var pins = [];
+    for (var i = 0; i < QUANTITY; i++) {
+      pins.push(pinsArrayFromResponse[i]);
+    }
+    // console.log(pins);
+    return pins;
+  };
+
+  var errorHandler = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
+  var pinsArr = window.load.load(successHandler, errorHandler);
+  // console.log(pinsArr);
+
+  //  var pinsArr = getArray();
 
   window.pin = {
+    QUANTITY: QUANTITY,
     pinsArr: pinsArr,
     renderPin: renderPin
   };

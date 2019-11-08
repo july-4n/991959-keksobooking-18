@@ -52,8 +52,9 @@
   }
 
   var renderPins = function (pins) {
+    // записываем весь массив в переменную чтоб можно было рисовать и удалять карточки
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < pins.length; i++) {
+    for (var i = 0; i < window.pin.QUANTITY; i++) {
       var pin = pins[i];
       var element = document.createElement('div');
       element.classList.add('pin');
