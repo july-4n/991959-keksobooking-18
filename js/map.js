@@ -3,6 +3,7 @@
 (function () {
 
   var ESC_KEYCODE = 27;
+  var QUANTITY = 5;
 
   var map = document.querySelector('.map');
   // Находит элемент, в который мы будем вставлять похожие объявления
@@ -29,11 +30,11 @@
   };
 
   // Функция создания обработчика на пин
-  function createClickPinHandler(index) {
+  function createClickPinHandler(pin) {
 
     //  Обработка нажатия на пин
     var clickPinHandler = function () {
-      var pin = window.pin.pinsArr[index];
+      // var pin = window.pin.pinsArr[index];
 
       removeCard();
 
@@ -54,11 +55,11 @@
   var renderPins = function (pins) {
     // записываем весь массив в переменную чтоб можно было рисовать и удалять карточки
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < window.pin.QUANTITY; i++) {
+    for (var i = 0; i < QUANTITY; i++) {
       var pin = pins[i];
       var element = document.createElement('div');
       element.classList.add('pin');
-      var pinClickHandler = createClickPinHandler(i);
+      var pinClickHandler = createClickPinHandler(pin);
       element.addEventListener('click', pinClickHandler);
       var renderedPin = window.pin.renderPin(pin);
       element.appendChild(renderedPin);
