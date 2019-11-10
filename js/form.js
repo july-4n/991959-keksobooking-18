@@ -59,7 +59,7 @@
     adFormDisabled(mapFiltersContainer, false);
     adForm.classList.remove('ad-form--disabled');
     mapFilters.classList.remove('map__filters--disabled');
-    window.map.renderPins(window.pin.pinsArr);
+    window.pin.activatePins();
   };
 
   var mapPinMain = document.querySelector('.map__pin--main');
