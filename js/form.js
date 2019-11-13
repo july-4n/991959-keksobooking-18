@@ -86,11 +86,14 @@
   mapPinMain.addEventListener('keydown', function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
       adFormActivation();
+      window.map.element.classList.remove('map--faded');
     }
   });
 
   var onSuccess = function () {
     window.backend.showSuccessMessage();
+    adForm.reset();
+    resetMainPin();
   };
 
   var onError = function () {
@@ -101,6 +104,12 @@
     evt.preventDefault();
     window.backend.sendRequest(onSuccess, onError, new FormData(adForm));
   });
+
+  var resetMainPin = function () {
+    mapPinMain.style.left = LOCATION_X_PIN + 'px';
+    mapPinMain.style.top = LOCATION_Y_PIN + 'px';
+    address.value = addressField((LOCATION_X_PIN), (LOCATION_Y_PIN));
+  };
 
   //  Перетаскивание
   mapPinMain.addEventListener('mousedown', function (evt) {
@@ -161,14 +170,13 @@
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
 
-
-      if (!dragged) {
+      if (!dragged || dragged && window.map.element.classList.contains('map--faded')) {
         var activateForm = function () {
           adFormActivation();
           window.map.element.classList.remove('map--faded');
-          mapPinMain.removeEventListener('mousedown', activateForm);
+          mapPinMain.removeEventListener('click', activateForm);
         };
-        mapPinMain.addEventListener('mousedown', activateForm);
+        mapPinMain.addEventListener('click', activateForm);
       }
     };
     document.addEventListener('mousemove', onMouseMove);
@@ -225,6 +233,7 @@
     PIN_WIDTH: PIN_WIDTH,
     PIN_HEIGHT: PIN_HEIGHT,
     adFormDisabled: adFormDisabled,
+    mapPinMain: mapPinMain,
     adForm: adForm,
     mapFiltersContainer: mapFiltersContainer
   };
