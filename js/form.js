@@ -92,6 +92,7 @@
 
   var onSuccess = function () {
     window.backend.showSuccessMessage();
+    window.form.adFormDisabled(window.form.adForm, true);
     adForm.reset();
     resetMainPin();
   };

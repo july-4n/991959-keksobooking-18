@@ -67,14 +67,11 @@
     errorText.textContent = errorMessage;
   };
 
-  var showSuccessMessage = function (successMessage) {
+  var showSuccessMessage = function () {
     var successTemplate = document.querySelector('#success')
       .content
       .querySelector('.success');
     createMessage(successTemplate);
-    var successText = successTemplate.querySelector('.success__message');
-    successText.textContent = successMessage;
-    window.form.adFormDisabled(window.form.adForm, true);
   };
 
   window.backend = {
