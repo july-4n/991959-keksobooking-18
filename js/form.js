@@ -24,6 +24,8 @@
     HOUSE_MIN_PRICE: 'Минимальная цена за ночь для дома - 5000 руб.',
     PALACE_MIN_PRICE: 'Минимальная цена за ночь для дворца - 10000 руб.'
   };
+  var mapPinMain = document.querySelector('.map__pin--main');
+  var mapOverlay = document.querySelector('.map__overlay');
 
   //  Функция заполнения поля адреса
   var addressField = function (pinX, pinY) {
@@ -45,8 +47,21 @@
     disableElements(fieldsets, isDisabled);
     disableElements(selects, isDisabled);
     disableElements(buttons, isDisabled);
-    if (isDisabled) {
+    if (isDisabled === false) {
       address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN - PIN_HEIGHT / 2));
+      adForm.classList.remove('ad-form--disabled');
+      mapFilters.classList.remove('map__filters--disabled');
+      window.pin.activatePins();
+    }
+    if (isDisabled === true) {
+      address.value = addressField((LOCATION_X_PIN), (LOCATION_Y_PIN));
+      adForm.classList.add('ad-form--disabled');
+      mapFilters.classList.add('map__filters--disabled');
+      window.map.element.classList.add('map--faded');
+      window.pin.hideAllPins();
+      if (document.querySelector('.popup') !== null) {
+        window.pin.hidePopup();
+      }
     }
   };
 
@@ -57,32 +72,50 @@
   var adFormActivation = function () {
     adFormDisabled(adForm, false);
     adFormDisabled(mapFiltersContainer, false);
-    adForm.classList.remove('ad-form--disabled');
-    mapFilters.classList.remove('map__filters--disabled');
-    window.pin.activatePins();
-  };
 
-  var mapPinMain = document.querySelector('.map__pin--main');
-  var mapOverlay = document.querySelector('.map__overlay');
+  };
 
   // Обработчик активации страницы по клику
 
-  mapPinMain.addEventListener('mousedown', function () {
-    adFormActivation();
-    window.map.element.classList.remove('map--faded');
-  });
+  // mapPinMain.addEventListener('mousedown', function () {
+  //   adFormActivation();
+  //   window.map.element.classList.remove('map--faded');
+  // });
 
   //  Обработчик активации страницы по нажатию на Enter
   mapPinMain.addEventListener('keydown', function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
       adFormActivation();
+      window.map.element.classList.remove('map--faded');
     }
   });
+
+  var onSuccess = function () {
+    window.backend.showSuccessMessage();
+    window.form.adFormDisabled(window.form.adForm, true);
+    adForm.reset();
+    resetMainPin();
+  };
+
+  var onError = function () {
+    window.backend.showErrorMessage();
+  };
+
+  adForm.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    window.backend.sendRequest(onSuccess, onError, new FormData(adForm));
+  });
+
+  var resetMainPin = function () {
+    mapPinMain.style.left = LOCATION_X_PIN + 'px';
+    mapPinMain.style.top = LOCATION_Y_PIN + 'px';
+    address.value = addressField((LOCATION_X_PIN), (LOCATION_Y_PIN));
+  };
 
   //  Перетаскивание
   mapPinMain.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
-
+    var dragged = false;
     var startCoords = {
       x: evt.clientX,
       y: evt.clientY
@@ -95,6 +128,7 @@
 
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
+      dragged = true;
 
       var shift = {
         x: startCoords.x - moveEvt.clientX,
@@ -136,8 +170,16 @@
       address.value = addressField(pinCoords.x, pinCoords.y + PIN_HEIGHT / 2 + PIN_HEIGHT_POINTER);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
-    };
 
+      if (!dragged || dragged && window.map.element.classList.contains('map--faded')) {
+        var activateForm = function () {
+          adFormActivation();
+          window.map.element.classList.remove('map--faded');
+          mapPinMain.removeEventListener('click', activateForm);
+        };
+        mapPinMain.addEventListener('click', activateForm);
+      }
+    };
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
@@ -191,5 +233,9 @@
   window.form = {
     PIN_WIDTH: PIN_WIDTH,
     PIN_HEIGHT: PIN_HEIGHT,
+    adFormDisabled: adFormDisabled,
+    mapPinMain: mapPinMain,
+    adForm: adForm,
+    mapFiltersContainer: mapFiltersContainer
   };
 })();

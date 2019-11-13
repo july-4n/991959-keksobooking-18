@@ -34,7 +34,7 @@
     var cardElement = cardTemplate.cloneNode(true);
     cardElement.querySelector('.popup__title').textContent = pin.offer.title;
     cardElement.querySelector('.popup__text--address').textContent = pin.offer.address;
-    cardElement.querySelector('.popup__text--price').textContent = pin.offer.price + '₽/ночь';
+    cardElement.querySelector('.popup__text--price').textContent = pin.offer.price + ' ₽/ночь';
     cardElement.querySelector('.popup__type').textContent = element[pin.offer.type];
     cardElement.querySelector('.popup__text--capacity').textContent = pin.offer.rooms + ' комнаты для ' + pin.offer.guests + ' гостей';
     cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + pin.offer.checkin + ', выезд до ' + pin.offer.checkout;
