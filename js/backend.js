@@ -4,9 +4,10 @@
 
   var SUCCESS_STATUS = 200;
   var REQUEST_TIMEOUT = 10000;
-  var URL = 'https://js.dump.academy/keksobooking/data';
+  var LOAD_URL = 'https://js.dump.academy/keksobooking/data';
+  var UPLOAD_URL = 'https://js.dump.academy/keksobooking';
 
-  var load = function (onSuccess, onError) {
+  var sendRequest = function (onSuccess, onError, data) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
@@ -14,7 +15,7 @@
       if (xhr.status === SUCCESS_STATUS) {
         onSuccess(xhr.response);
       } else {
-        onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
+        onError(xhr.status);
       }
     });
     xhr.addEventListener('error', function () {
@@ -26,29 +27,56 @@
 
     xhr.timeout = REQUEST_TIMEOUT;
 
-    xhr.open('GET', URL);
-    xhr.send();
+    if (data) {
+      xhr.open('POST', UPLOAD_URL);
+      xhr.send(data);
+    } else {
+      xhr.open('GET', LOAD_URL);
+      xhr.send();
+    }
   };
 
-  var main = document.querySelector('main');
+  var createMessage = function (template) {
+    var popupMessage = template.cloneNode(true);
+    var removePopup = function () {
+      popupMessage.remove();
+      document.removeEventListener('keydown', onPopupEscPress);
+    };
 
-  var errorTemplate = document.querySelector('#error')
-    .content
-    .querySelector('.error');
+    var onPopupEscPress = function (evt) {
+      if (evt.keyCode === 27) {
+        removePopup();
+      }
+    };
 
-  var errorHandler = function (errorMessage) {
-    var errorElement = errorTemplate.cloneNode(true);
-    var errorText = errorTemplate.querySelector('.error__message');
-    var errorBtn = errorTemplate.querySelector('.error__button');
-    errorText.textContent = errorMessage;
-    main.insertAdjacentElement('afterbegin', errorTemplate);
-    errorBtn.addEventListener('click', function () {
-      errorElement.classList.add('visually-hidden');
+    document.addEventListener('keydown', onPopupEscPress);
+    popupMessage.addEventListener('click', function () {
+      removePopup();
     });
+
+    var main = document.querySelector('main');
+    main.insertAdjacentElement('afterbegin', popupMessage);
+  };
+
+  var showErrorMessage = function (errorMessage) {
+    var errorTemplate = document.querySelector('#error')
+      .content
+      .querySelector('.error');
+    createMessage(errorTemplate);
+    var errorText = document.querySelector('.error__message');
+    errorText.textContent = errorMessage;
+  };
+
+  var showSuccessMessage = function () {
+    var successTemplate = document.querySelector('#success')
+      .content
+      .querySelector('.success');
+    createMessage(successTemplate);
   };
 
   window.backend = {
-    load: load,
-    errorHandler: errorHandler
+    sendRequest: sendRequest,
+    showErrorMessage: showErrorMessage,
+    showSuccessMessage: showSuccessMessage
   };
 })();
