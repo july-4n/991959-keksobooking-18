@@ -7,7 +7,7 @@
     .querySelector('.popup');
 
   //  Функция для отрисовки фотографий
-  var renderPhotos = function (cardElement, pin) {
+  var renderPhotos = function (photosElement, pin) {
     var fragment = document.createDocumentFragment();
     for (var i = 0; i < pin.offer.photos.length; i++) {
       var img = document.createElement('img');
@@ -17,7 +17,7 @@
       img.height = 40;
       fragment.appendChild(img);
     }
-    cardElement.appendChild(fragment);
+    photosElement.appendChild(fragment);
   };
 
   //  Отрисовка модального окна с объявлением
@@ -32,7 +32,7 @@
     cardElement.querySelector('.popup__features').textContent = pin.offer.features;
     cardElement.querySelector('.popup__description').textContent = pin.offer.description;
     cardElement.querySelector('.popup__avatar').src = pin.author.avatar;
-    cardElement.querySelector('.popup__photos').src = renderPhotos(cardElement, pin);
+    renderPhotos(cardElement.querySelector('.popup__photos'), pin);
     return cardElement;
   };
 
