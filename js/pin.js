@@ -18,15 +18,14 @@
     return element;
   };
 
-  var pinsArray;
   var successHandler = function (pinsFromResponse) {
-    pinsArray = pinsFromResponse;
-    window.map.renderPins(pinsArray);
+    window.pinsArray = pinsFromResponse;
+    window.map.renderPins(window.filters.allFilter(window.pinsArray));
   };
 
-  var hideAllPins = function () {
-    document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (element) {
-      element.classList.add('visually-hidden');
+  var removeAllPins = function () {
+    document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
+      pin.parentNode.parentNode.removeChild(pin.parentNode);
     });
   };
 
@@ -36,13 +35,13 @@
   };
 
   var activatePins = function () {
-    window.backend.sendRequest(successHandler, window.backend.showErrorMessage);
+    window.backend.sendRequest(successHandler, window.form.onError);
   };
 
   window.pin = {
     activatePins: activatePins,
     renderPin: renderPin,
-    hideAllPins: hideAllPins,
+    removeAllPins: removeAllPins,
     hidePopup: hidePopup
   };
 })();

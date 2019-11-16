@@ -3,7 +3,6 @@
 (function () {
 
   var ESC_KEYCODE = 27;
-  var QUANTITY = 5;
 
   var map = document.querySelector('.map');
   // Находит элемент, в который мы будем вставлять похожие объявления
@@ -11,8 +10,13 @@
   var renderedCard;
 
   var removeCard = function () {
-  // Карточку берем из замыкания модуля
-  // Если ее нет, то ничего не делать
+    //  вместе с карточкой удаляем map__pin--active с пина
+    var pinActive = document.querySelector('.map__pin--active');
+    if (pinActive !== null) {
+      pinActive.classList.remove('map__pin--active');
+    }
+    //  Карточку берем из замыкания модуля
+    //  Если ее нет, то ничего не делать
     if (!renderedCard) {
       return;
     }
@@ -33,13 +37,11 @@
   function createClickPinHandler(pin) {
 
     //  Обработка нажатия на пин
-    var clickPinHandler = function () {
-      // var pin = window.pin.pinsArr[index];
-
+    var clickPinHandler = function (evt) {
       removeCard();
-
       renderedCard = window.card.renderCardElement(pin);
       map.appendChild(renderedCard);
+      evt.currentTarget.classList.add('map__pin--active');
 
       var closeButton = renderedCard.querySelector('.popup__close');
 
@@ -55,7 +57,7 @@
   var renderPins = function (pins) {
     // записываем весь массив в переменную чтоб можно было рисовать и удалять карточки
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < QUANTITY; i++) {
+    for (var i = 0; i < pins.length; i++) {
       var pin = pins[i];
       var element = document.createElement('div');
       element.classList.add('pin');
@@ -72,6 +74,6 @@
   window.map = {
     element: map,
     mapTop: mapTop,
-    renderPins: renderPins
+    renderPins: renderPins,
   };
 })();
