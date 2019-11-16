@@ -34,17 +34,6 @@
     popup.classList.add('visually-hidden');
   };
 
-  var hideAllPins = function () {
-    document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (element) {
-      element.classList.add('visually-hidden');
-    });
-  };
-
-  var hidePopup = function () {
-    var popup = document.querySelector('.popup');
-    popup.classList.add('visually-hidden');
-  };
-
   var activatePins = function () {
     window.backend.sendRequest(successHandler, window.form.onError);
   };
