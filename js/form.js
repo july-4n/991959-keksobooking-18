@@ -30,6 +30,30 @@
   var mapPinMain = document.querySelector('.map__pin--main');
   var mapOverlay = document.querySelector('.map__overlay');
   var resetButton = document.querySelector('.ad-form__reset');
+  var avatarFileChooser = document.querySelector('#avatar');
+  var avatarPreview = document.querySelector('.ad-form-header__preview img');
+  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+  var photosFileChooser = document.querySelector('#images');
+  var photosPreview = document.querySelector('.ad-form__upload');
+
+  //  Загрузка аватарки
+  avatarFileChooser.addEventListener('change', function () {
+    var file = avatarFileChooser.files[0];
+    if (file) {
+      var fileName = file.name.toLowerCase();
+
+      var matches = FILE_TYPES.some(function (it) {
+        return fileName.endsWith(it);
+      });
+    }
+    if (matches) {
+      var reader = new FileReader();
+      reader.addEventListener('load', function () {
+        avatarPreview.src = reader.result;
+      });
+      reader.readAsDataURL(file);
+    }
+  });
 
   //  Функция заполнения поля адреса
   var addressField = function (pinX, pinY) {
