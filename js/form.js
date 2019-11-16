@@ -33,8 +33,8 @@
   var avatarFileChooser = document.querySelector('#avatar');
   var avatarPreview = document.querySelector('.ad-form-header__preview img');
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
-  var photosFileChooser = document.querySelector('#images');
-  var photosPreview = document.querySelector('.ad-form__upload');
+  // var photosFileChooser = document.querySelector('#images');
+  // var photosPreview = document.querySelector('.ad-form__upload');
 
   //  Загрузка аватарки
   avatarFileChooser.addEventListener('change', function () {
