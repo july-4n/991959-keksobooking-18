@@ -33,8 +33,12 @@
   var avatarFileChooser = document.querySelector('#avatar');
   var avatarPreview = document.querySelector('.ad-form-header__preview img');
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
-  // var photosFileChooser = document.querySelector('#images');
-  // var photosPreview = document.querySelector('.ad-form__upload');
+  var photosFileChooser = document.querySelector('#images');
+  var photoPreview = document.querySelector('.ad-form__photo');
+  var image = {
+    WIDTH: 70,
+    HEIGHT: 70
+  };
 
   //  Загрузка аватарки
   avatarFileChooser.addEventListener('change', function () {
@@ -50,6 +54,26 @@
       var reader = new FileReader();
       reader.addEventListener('load', function () {
         avatarPreview.src = reader.result;
+      });
+      reader.readAsDataURL(file);
+    }
+  });
+
+  //  Загрузка фотографий
+  photosFileChooser.addEventListener('change', function () {
+    var file = photosFileChooser.files[0];
+    var fileName = file.name.toLowerCase();
+    var matches = FILE_TYPES.some(function (it) {
+      return fileName.endsWith(it);
+    });
+    if (matches) {
+      var reader = new FileReader();
+      reader.addEventListener('load', function () {
+        var photoElement = document.createElement('img');
+        photoElement.width = image.WIDTH;
+        photoElement.height = image.HEIGHT;
+        photoPreview.appendChild(photoElement);
+        photoElement.src = reader.result;
       });
       reader.readAsDataURL(file);
     }
@@ -79,7 +103,7 @@
       address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN - PIN_HEIGHT / 2 + PIN_HEIGHT_POINTER));
       adForm.classList.remove('ad-form--disabled');
       mapFilters.classList.remove('map__filters--disabled');
-      //  проверка, чтобы запрос на сервер уезжал только при актввции формы
+      //  проверка, чтобы запрос на сервер уезжал только при активации формы
       if (elem.querySelector('fieldset').classList.value === 'ad-form-header') {
         window.pin.activatePins();
       }
@@ -115,33 +139,16 @@
 
   var onSuccess = function () {
     window.backend.showSuccessMessage();
-    window.form.adFormDisabled(window.form.adForm, true);
-    adForm.reset();
+    adFormDisabled(adForm, true);
+    adFormDisabled(mapFiltersContainer, true);
+    adForm.reset(adForm, true);
     window.filters.filtersForm.reset();
     resetMainPin();
   };
 
-  var onError = function (status) {
-    var errorMessage;
-    if (status === 400) {
-      errorMessage = 'Ошибка загрузки объявлений. Код ошибки: 400.';
-    } else if (status === 401) {
-      errorMessage = 'Ошибка загрузки объявлений. Код ошибки: 401.';
-    } else if (status === 403) {
-      errorMessage = 'Ошибка загрузки объявлений. Код ошибки: 403.';
-    } else if (status === 404) {
-      errorMessage = 'Ошибка загрузки объявлений. Код ошибки: 404.';
-    } else if (status === 500) {
-      errorMessage = 'Не удалось отправить. Код ошибки: 500.';
-    } else {
-      errorMessage = 'Ошибка! Код ошибки: ' + status;
-    }
-    window.backend.showErrorMessage(errorMessage);
-  };
-
   adForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
-    window.backend.sendRequest(onSuccess, onError, new FormData(adForm));
+    window.backend.sendRequest(onSuccess, new FormData(adForm));
   });
 
   var resetMainPin = function () {
@@ -200,12 +207,13 @@
       }
       mapPinMain.style.left = (pinCoords.x) + 'px';
       mapPinMain.style.top = (pinCoords.y) + 'px';
+      address.value = addressField(pinCoords.x + PIN_WIDTH / 2, pinCoords.y);// + PIN_HEIGHT + PIN_HEIGHT_POINTER);
+
     };
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
       //  Изменение поля адреса при отпускании кнопки мыши
-      address.value = addressField(pinCoords.x + PIN_WIDTH / 2, pinCoords.y);// + PIN_HEIGHT / 2 + PIN_HEIGHT_POINTER);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
 
@@ -214,7 +222,7 @@
           adFormActivation();
           window.map.element.classList.remove('map--faded');
           mapPinMain.removeEventListener('click', activateForm);
-          address.value = addressField(pinCoords.x + PIN_WIDTH / 2, pinCoords.y);
+          address.value = addressField(pinCoords.x + PIN_WIDTH / 2, pinCoords.y); //  координаты острого конца пина
         };
         mapPinMain.addEventListener('click', activateForm);
       }
@@ -226,8 +234,9 @@
   //  отработка кнопки ad-form__reset
   //  по клику
   resetButton.addEventListener('mousedown', function () {
-    window.form.adFormDisabled(window.form.adForm, true);
-    adForm.reset();
+    adFormDisabled(adForm, true);
+    adFormDisabled(mapFiltersContainer, true);
+    adForm.reset(adForm, true);
     window.filters.filtersForm.reset();
     resetMainPin();
   });
@@ -235,7 +244,7 @@
   //  по нажатию на Enter
   resetButton.addEventListener('keydown', function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
-      window.form.adFormDisabled(window.form.adForm, true);
+      adFormDisabled(adForm, true);
       adForm.reset();
       window.filters.filtersForm.reset();
       resetMainPin();
@@ -317,8 +326,6 @@
     PIN_HEIGHT: PIN_HEIGHT,
     adFormDisabled: adFormDisabled,
     mapPinMain: mapPinMain,
-    adForm: adForm,
     mapFiltersContainer: mapFiltersContainer,
-    onError: onError
   };
 })();
