@@ -35,7 +35,7 @@
   };
 
   var activatePins = function () {
-    window.backend.sendRequest(successHandler, window.form.onError);
+    window.backend.sendRequest(successHandler);
   };
 
   window.pin = {
