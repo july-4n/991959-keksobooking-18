@@ -4,10 +4,21 @@
 
   var SUCCESS_STATUS = 200;
   var REQUEST_TIMEOUT = 10000;
-  var LOAD_URL = 'https://js.dump.academy/keksobooking/data';
-  var UPLOAD_URL = 'https://js.dump.academy/keksobooking';
+  var Url = {
+    LOAD: 'https://js.dump.academy/keksobooking/data',
+    UPLOAD: 'https://js.dump.academy/keksobooking'
+  };
+  var ErrorCodes = {
+    CLIENT: 400,
+    SERVER: 500
+  };
+  var ErrorText = {
+    CLIENT: 'Ошибка загрузки объявлений. ',
+    SERVER: 'Произошла ошибка на сервере, попробуйте позже. ',
+    OTHER: 'Ошибка! Код ошибки: '
+  };
 
-  var sendRequest = function (onSuccess, onError, data) {
+  var sendRequest = function (onSuccess, data) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
@@ -28,10 +39,10 @@
     xhr.timeout = REQUEST_TIMEOUT;
 
     if (data) {
-      xhr.open('POST', UPLOAD_URL);
+      xhr.open('POST', Url.UPLOAD);
       xhr.send(data);
     } else {
-      xhr.open('GET', LOAD_URL);
+      xhr.open('GET', Url.LOAD);
       xhr.send();
     }
   };
@@ -44,7 +55,7 @@
     };
 
     var onPopupEscPress = function (evt) {
-      if (evt.keyCode === 27) {
+      if (evt.keyCode === window.map.ESC_KEYCODE) {
         removePopup();
       }
     };
@@ -74,9 +85,20 @@
     createMessage(successTemplate);
   };
 
+  var onError = function (status) {
+    var errorMessage;
+    if (ErrorCodes.SERVER > status >= ErrorCodes.CLIENT) {
+      errorMessage = ErrorText.CLIENT + status;
+    } else if (status >= ErrorCodes.SERVER) {
+      errorMessage = ErrorText.SERVER + status;
+    } else {
+      errorMessage = ErrorText.OTHER + status;
+    }
+    showErrorMessage(errorMessage);
+  };
+
   window.backend = {
     sendRequest: sendRequest,
-    showErrorMessage: showErrorMessage,
     showSuccessMessage: showSuccessMessage
   };
 })();
