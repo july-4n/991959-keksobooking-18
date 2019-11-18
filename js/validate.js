@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var MIN_TITLE_LENGTH = 30;
   var ErrorText = {
     TITLE_IS_TOO_SHORT: 'Длина заголовка не может быть меньше 30 символов. Пожалуйста, постарайтесь!',
     GUESTS: 'Количество гостей должно быть меньше или равно количеству комнат',
@@ -17,15 +18,14 @@
     MIN: 0,
     MAX: 1000000
   };
-  var minTitleLength = 30;
 
   var titleValue = window.form.adForm.querySelector('#title');
   var guestsValue = window.form.adForm.querySelector('#capacity');
   var roomsValue = window.form.adForm.querySelector('#room_number');
 
   var validateTitle = function () {
-    var titleLength = Array.from(titleValue.value).length; //  берем длину массива введенного значения заголовка, чтобы не считать коды смайликов, а считать их за 1 символ
-    if (titleLength < minTitleLength) {
+    var titleLength = titleValue.value.length;
+    if (titleLength < MIN_TITLE_LENGTH) {
       titleValue.setCustomValidity(ErrorText.TITLE_IS_TOO_SHORT);
     } else {
       titleValue.setCustomValidity('');
