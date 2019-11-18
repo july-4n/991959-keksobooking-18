@@ -2,10 +2,6 @@
 
 (function () {
 
-  var mapFiltersContainer = document.querySelector('.map__filters-container');
-  var mapFilters = document.querySelector('.map__filters');
-  var adForm = document.querySelector('.ad-form');
-  var address = document.querySelector('#address');
   var LOCATION_X_PIN = 570;
   var LOCATION_Y_PIN = 375;
   var PIN_WIDTH = 62;
@@ -16,6 +12,7 @@
   var X_MAX = 1200;
   var Y_MIN = 130;
   var Y_MAX = 630;
+  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
   var ErrorText = {
     TITLE_IS_TOO_SHORT: 'Длина заголовка не может быть меньше 30 символов. Пожалуйста, постарайтесь!',
     GUESTS: 'Количество гостей должно быть меньше или равно количеству комнат',
@@ -27,14 +24,40 @@
     PRICE_IS_BELOW_ZERO: 'Вы указали отрицательную стоимость! Вы отщедрот?',
     OVERPRICE: 'Максимально допустимая стоимость жилья - 1000000 руб.'
   };
+  var MinPriceHouses = {
+    BUNGALO: 0,
+    FLAT: 1000,
+    HOUSE: 5000,
+    PALACE: 10000
+  };
+  var HousingTypeToPrice = {
+    BUNGALO: '0',
+    FLAT: '1000',
+    HOUSE: '5000',
+    PALACE: '10000'
+  };
+  var RoomsNumber = {
+    MIN: '0',
+    MAX: '100'
+  };
+  var Image = {
+    WIDTH: 70,
+    HEIGHT: 70
+  };
+  var mapFiltersContainer = document.querySelector('.map__filters-container');
+  var mapFilters = document.querySelector('.map__filters');
+  var adForm = document.querySelector('.ad-form');
+  var address = document.querySelector('#address');
   var mapPinMain = document.querySelector('.map__pin--main');
   var mapOverlay = document.querySelector('.map__overlay');
   var resetButton = document.querySelector('.ad-form__reset');
   var avatarFileChooser = document.querySelector('#avatar');
   var avatarPreview = document.querySelector('.ad-form-header__preview img');
-  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
-  // var photosFileChooser = document.querySelector('#images');
-  // var photosPreview = document.querySelector('.ad-form__upload');
+
+  var photosFileChooser = document.querySelector('#images');
+  var photoPreview = document.querySelector('.ad-form__photo');
+
+  var minTitleLenght = 30;
 
   //  Загрузка аватарки
   avatarFileChooser.addEventListener('change', function () {
@@ -50,6 +73,26 @@
       var reader = new FileReader();
       reader.addEventListener('load', function () {
         avatarPreview.src = reader.result;
+      });
+      reader.readAsDataURL(file);
+    }
+  });
+
+  //  Загрузка фотографий
+  photosFileChooser.addEventListener('change', function () {
+    var file = photosFileChooser.files[0];
+    var fileName = file.name.toLowerCase();
+    var matches = FILE_TYPES.some(function (it) {
+      return fileName.endsWith(it);
+    });
+    if (matches) {
+      var reader = new FileReader();
+      reader.addEventListener('load', function () {
+        var photoElement = document.createElement('img');
+        photoElement.width = Image.WIDTH;
+        photoElement.height = Image.HEIGHT;
+        photoPreview.appendChild(photoElement);
+        photoElement.src = reader.result;
       });
       reader.readAsDataURL(file);
     }
@@ -76,16 +119,16 @@
     disableElements(selects, isDisabled);
     disableElements(buttons, isDisabled);
     if (isDisabled === false) {
-      address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN - PIN_HEIGHT / 2 + PIN_HEIGHT_POINTER));
+      address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT + PIN_HEIGHT_POINTER));
       adForm.classList.remove('ad-form--disabled');
       mapFilters.classList.remove('map__filters--disabled');
-      //  проверка, чтобы запрос на сервер уезжал только при актввции формы
+      //  проверка, чтобы запрос на сервер уезжал только при активации формы
       if (elem.querySelector('fieldset').classList.value === 'ad-form-header') {
         window.pin.activatePins();
       }
     }
     if (isDisabled === true) {
-      address.value = addressField((LOCATION_X_PIN), (LOCATION_Y_PIN));
+      address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT / 2));
       adForm.classList.add('ad-form--disabled');
       mapFilters.classList.add('map__filters--disabled');
       window.map.element.classList.add('map--faded');
@@ -115,39 +158,22 @@
 
   var onSuccess = function () {
     window.backend.showSuccessMessage();
-    window.form.adFormDisabled(window.form.adForm, true);
-    adForm.reset();
+    adFormDisabled(adForm, true);
+    adFormDisabled(mapFiltersContainer, true);
+    adForm.reset(adForm, true);
     window.filters.filtersForm.reset();
     resetMainPin();
   };
 
-  var onError = function (status) {
-    var errorMessage;
-    if (status === 400) {
-      errorMessage = 'Ошибка загрузки объявлений. Код ошибки: 400.';
-    } else if (status === 401) {
-      errorMessage = 'Ошибка загрузки объявлений. Код ошибки: 401.';
-    } else if (status === 403) {
-      errorMessage = 'Ошибка загрузки объявлений. Код ошибки: 403.';
-    } else if (status === 404) {
-      errorMessage = 'Ошибка загрузки объявлений. Код ошибки: 404.';
-    } else if (status === 500) {
-      errorMessage = 'Не удалось отправить. Код ошибки: 500.';
-    } else {
-      errorMessage = 'Ошибка! Код ошибки: ' + status;
-    }
-    window.backend.showErrorMessage(errorMessage);
-  };
-
   adForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
-    window.backend.sendRequest(onSuccess, onError, new FormData(adForm));
+    window.backend.sendRequest(onSuccess, new FormData(adForm));
   });
 
   var resetMainPin = function () {
-    mapPinMain.style.left = LOCATION_X_PIN + 'px';
-    mapPinMain.style.top = LOCATION_Y_PIN + 'px';
-    address.value = addressField((LOCATION_X_PIN), (LOCATION_Y_PIN));
+    mapPinMain.style.left = LOCATION_X_PIN + PIN_WIDTH / 2 + 'px';
+    mapPinMain.style.top = LOCATION_Y_PIN + PIN_HEIGHT / 2 + 'px';
+    address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT / 2));
   };
 
   //  Перетаскивание
@@ -193,19 +219,19 @@
       } else if (pinCoords.x > X_MAX - PIN_WIDTH / 2) {
         pinCoords.x = mapOverlay.offsetLeft + X_MAX - PIN_WIDTH / 2;
       }
-      if (pinCoords.y < Y_MIN) {
-        pinCoords.y = Y_MIN;
-      } else if (pinCoords.y > Y_MAX) {
-        pinCoords.y = mapOverlay.offsetTop + Y_MAX;
+      if (pinCoords.y < Y_MIN - PIN_HEIGHT - PIN_HEIGHT_POINTER) {
+        pinCoords.y = Y_MIN - PIN_HEIGHT - PIN_HEIGHT_POINTER;
+      } else if (pinCoords.y > Y_MAX - PIN_HEIGHT - PIN_HEIGHT_POINTER) {
+        pinCoords.y = mapOverlay.offsetTop + Y_MAX - PIN_HEIGHT - PIN_HEIGHT_POINTER;
       }
       mapPinMain.style.left = (pinCoords.x) + 'px';
       mapPinMain.style.top = (pinCoords.y) + 'px';
+      address.value = addressField(pinCoords.x + PIN_WIDTH / 2, pinCoords.y + PIN_HEIGHT + PIN_HEIGHT_POINTER);
     };
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
       //  Изменение поля адреса при отпускании кнопки мыши
-      address.value = addressField(pinCoords.x + PIN_WIDTH / 2, pinCoords.y);// + PIN_HEIGHT / 2 + PIN_HEIGHT_POINTER);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
 
@@ -214,7 +240,7 @@
           adFormActivation();
           window.map.element.classList.remove('map--faded');
           mapPinMain.removeEventListener('click', activateForm);
-          address.value = addressField(pinCoords.x + PIN_WIDTH / 2, pinCoords.y);
+          address.value = addressField(pinCoords.x + PIN_WIDTH / 2, pinCoords.y + PIN_HEIGHT + PIN_HEIGHT_POINTER); //  координаты острого конца пина
         };
         mapPinMain.addEventListener('click', activateForm);
       }
@@ -226,8 +252,9 @@
   //  отработка кнопки ad-form__reset
   //  по клику
   resetButton.addEventListener('mousedown', function () {
-    window.form.adFormDisabled(window.form.adForm, true);
-    adForm.reset();
+    adFormDisabled(adForm, true);
+    adFormDisabled(mapFiltersContainer, true);
+    adForm.reset(adForm, true);
     window.filters.filtersForm.reset();
     resetMainPin();
   });
@@ -235,7 +262,7 @@
   //  по нажатию на Enter
   resetButton.addEventListener('keydown', function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
-      window.form.adFormDisabled(window.form.adForm, true);
+      adFormDisabled(adForm, true);
       adForm.reset();
       window.filters.filtersForm.reset();
       resetMainPin();
@@ -258,15 +285,15 @@
     var inputPrice = inputPriceValue.value;
     var inputType = inputTypeValue.value;
     var titleLength = Array.from(titleValue.value).length; //  берем длину массива введенного значения заголовка, чтобы не считать коды смайликов, а считать их за 1 символ
-    if (titleLength < 30) {
+    if (titleLength < minTitleLenght) {
       titleValue.setCustomValidity(ErrorText.TITLE_IS_TOO_SHORT);
     } else {
       titleValue.setCustomValidity('');
     }
 
-    if (roomsNumber === '100' && guestsNumber !== '0') {
+    if (roomsNumber === RoomsNumber.MAX && guestsNumber !== RoomsNumber.MIN) {
       guestsValue.setCustomValidity(ErrorText.NOT_GUESTS);
-    } else if (guestsNumber === '0' && roomsNumber !== '100') {
+    } else if (guestsNumber === RoomsNumber.MIN && roomsNumber !== RoomsNumber.MAX) {
       guestsValue.setCustomValidity(ErrorText.VALUE_GUESTS);
     } else if (roomsNumber < guestsNumber) {
       guestsValue.setCustomValidity(ErrorText.GUESTS);
@@ -276,11 +303,11 @@
 
     if (inputPrice < 0) {
       inputPriceValue.setCustomValidity(ErrorText.PRICE_IS_BELOW_ZERO);
-    } else if (inputType === 'flat' && inputPrice < 1000) {
+    } else if (inputType === 'flat' && inputPrice < MinPriceHouses.FLAT) {
       inputPriceValue.setCustomValidity(ErrorText.FLAT_MIN_PRICE);
-    } else if (inputType === 'house' && inputPrice < 5000) {
+    } else if (inputType === 'house' && inputPrice < MinPriceHouses.HOUSE) {
       inputPriceValue.setCustomValidity(ErrorText.HOUSE_MIN_PRICE);
-    } else if (inputType === 'palace' && inputPrice < 10000) {
+    } else if (inputType === 'palace' && inputPrice < MinPriceHouses.PALACE) {
       inputPriceValue.setCustomValidity(ErrorText.PALACE_MIN_PRICE);
     } else if (inputPrice > 1000000) {
       inputPriceValue.setCustomValidity(ErrorText.OVERPRICE);
@@ -292,13 +319,13 @@
   //  Синхронизация плейсхолдера с типом жилья
   inputTypeValue.addEventListener('change', function () {
     if (inputTypeValue.value === 'bungalo') {
-      inputPriceValue.placeholder = '0';
+      inputPriceValue.placeholder = HousingTypeToPrice.BUNGALO;
     } else if (inputTypeValue.value === 'flat') {
-      inputPriceValue.placeholder = '1000';
+      inputPriceValue.placeholder = HousingTypeToPrice.FLAT;
     } else if (inputTypeValue.value === 'house') {
-      inputPriceValue.placeholder = '5000';
+      inputPriceValue.placeholder = HousingTypeToPrice.HOUSE;
     } else if (inputTypeValue.value === 'palace') {
-      inputPriceValue.placeholder = '10000';
+      inputPriceValue.placeholder = HousingTypeToPrice.PALACE;
     }
   });
 
@@ -317,8 +344,6 @@
     PIN_HEIGHT: PIN_HEIGHT,
     adFormDisabled: adFormDisabled,
     mapPinMain: mapPinMain,
-    adForm: adForm,
     mapFiltersContainer: mapFiltersContainer,
-    onError: onError
   };
 })();

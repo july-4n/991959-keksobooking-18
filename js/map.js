@@ -72,6 +72,7 @@
   };
 
   window.map = {
+    ESC_KEYCODE: ESC_KEYCODE,
     element: map,
     mapTop: mapTop,
     renderPins: renderPins,
