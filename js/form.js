@@ -13,37 +13,19 @@
   var Y_MIN = 130;
   var Y_MAX = 630;
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
-  var ErrorText = {
-    TITLE_IS_TOO_SHORT: 'Длина заголовка не может быть меньше 30 символов. Пожалуйста, постарайтесь!',
-    GUESTS: 'Количество гостей должно быть меньше или равно количеству комнат',
-    NOT_GUESTS: 'Такие большие помещения не для гостей',
-    VALUE_GUESTS: 'Укажите количество гостей',
-    FLAT_MIN_PRICE: 'Минимальная цена за ночь для квартиры - 1000 руб.',
-    HOUSE_MIN_PRICE: 'Минимальная цена за ночь для дома - 5000 руб.',
-    PALACE_MIN_PRICE: 'Минимальная цена за ночь для дворца - 10000 руб.',
-    PRICE_IS_BELOW_ZERO: 'Вы указали отрицательную стоимость! Вы отщедрот?',
-    OVERPRICE: 'Максимально допустимая стоимость жилья - 1000000 руб.'
-  };
+
   var MinPriceHouses = {
     BUNGALO: 0,
     FLAT: 1000,
     HOUSE: 5000,
     PALACE: 10000
   };
-  var HousingTypeToPrice = {
-    BUNGALO: '0',
-    FLAT: '1000',
-    HOUSE: '5000',
-    PALACE: '10000'
-  };
-  var RoomsNumber = {
-    MIN: '0',
-    MAX: '100'
-  };
+
   var Image = {
     WIDTH: 70,
     HEIGHT: 70
   };
+
   var mapFiltersContainer = document.querySelector('.map__filters-container');
   var mapFilters = document.querySelector('.map__filters');
   var adForm = document.querySelector('.ad-form');
@@ -53,11 +35,8 @@
   var resetButton = document.querySelector('.ad-form__reset');
   var avatarFileChooser = document.querySelector('#avatar');
   var avatarPreview = document.querySelector('.ad-form-header__preview img');
-
   var photosFileChooser = document.querySelector('#images');
   var photoPreview = document.querySelector('.ad-form__photo');
-
-  var minTitleLenght = 30;
 
   //  Загрузка аватарки
   avatarFileChooser.addEventListener('change', function () {
@@ -118,23 +97,22 @@
     disableElements(fieldsets, isDisabled);
     disableElements(selects, isDisabled);
     disableElements(buttons, isDisabled);
-    if (isDisabled === false) {
-      address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT + PIN_HEIGHT_POINTER));
-      adForm.classList.remove('ad-form--disabled');
-      mapFilters.classList.remove('map__filters--disabled');
-      //  проверка, чтобы запрос на сервер уезжал только при активации формы
-      if (elem.querySelector('fieldset').classList.value === 'ad-form-header') {
-        window.pin.activatePins();
-      }
-    }
-    if (isDisabled === true) {
+    if (isDisabled) {
       address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT / 2));
       adForm.classList.add('ad-form--disabled');
       mapFilters.classList.add('map__filters--disabled');
       window.map.element.classList.add('map--faded');
       window.pin.removeAllPins();
       if (document.querySelector('.popup') !== null) {
-        window.pin.hidePopup();
+        window.map.removeCard();
+      }
+    } else {
+      address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT + PIN_HEIGHT_POINTER));
+      adForm.classList.remove('ad-form--disabled');
+      mapFilters.classList.remove('map__filters--disabled');
+      //  проверка, чтобы запрос на сервер уезжал только при активации формы
+      if (elem.querySelector('fieldset').classList.value === 'ad-form-header') {
+        window.pin.activatePins();
       }
     }
   };
@@ -240,7 +218,7 @@
           adFormActivation();
           window.map.element.classList.remove('map--faded');
           mapPinMain.removeEventListener('click', activateForm);
-          address.value = addressField(pinCoords.x + PIN_WIDTH / 2, pinCoords.y + PIN_HEIGHT + PIN_HEIGHT_POINTER); //  координаты острого конца пина
+          address.value = addressField(pinCoords.x + PIN_WIDTH / 2, pinCoords.y + PIN_HEIGHT + PIN_HEIGHT_POINTER);
         };
         mapPinMain.addEventListener('click', activateForm);
       }
@@ -269,63 +247,32 @@
     }
   });
 
-  //  Валидация
-  var titleValue = adForm.querySelector('#title');
-  var guestsValue = adForm.querySelector('#capacity');
-  var roomsValue = adForm.querySelector('#room_number');
   var adFormSubmit = adForm.querySelector('.ad-form__submit');
-  var inputPriceValue = adForm.querySelector('#price');
+  adFormSubmit.addEventListener('click', function () {
+    window.validate.validateTitle();
+    window.validate.validateRooms();
+    window.validate.validatePrice();
+  });
+
   var inputTypeValue = adForm.querySelector('#type');
   var inputTimeInValue = adForm.querySelector('#timein');
   var inputTimeOutValue = adForm.querySelector('#timeout');
+  var inputPriceValue = adForm.querySelector('#price');
 
-  adFormSubmit.addEventListener('click', function () {
-    var guestsNumber = guestsValue.value;
-    var roomsNumber = roomsValue.value;
-    var inputPrice = inputPriceValue.value;
-    var inputType = inputTypeValue.value;
-    var titleLength = Array.from(titleValue.value).length; //  берем длину массива введенного значения заголовка, чтобы не считать коды смайликов, а считать их за 1 символ
-    if (titleLength < minTitleLenght) {
-      titleValue.setCustomValidity(ErrorText.TITLE_IS_TOO_SHORT);
-    } else {
-      titleValue.setCustomValidity('');
-    }
-
-    if (roomsNumber === RoomsNumber.MAX && guestsNumber !== RoomsNumber.MIN) {
-      guestsValue.setCustomValidity(ErrorText.NOT_GUESTS);
-    } else if (guestsNumber === RoomsNumber.MIN && roomsNumber !== RoomsNumber.MAX) {
-      guestsValue.setCustomValidity(ErrorText.VALUE_GUESTS);
-    } else if (roomsNumber < guestsNumber) {
-      guestsValue.setCustomValidity(ErrorText.GUESTS);
-    } else {
-      guestsValue.setCustomValidity('');
-    }
-
-    if (inputPrice < 0) {
-      inputPriceValue.setCustomValidity(ErrorText.PRICE_IS_BELOW_ZERO);
-    } else if (inputType === 'flat' && inputPrice < MinPriceHouses.FLAT) {
-      inputPriceValue.setCustomValidity(ErrorText.FLAT_MIN_PRICE);
-    } else if (inputType === 'house' && inputPrice < MinPriceHouses.HOUSE) {
-      inputPriceValue.setCustomValidity(ErrorText.HOUSE_MIN_PRICE);
-    } else if (inputType === 'palace' && inputPrice < MinPriceHouses.PALACE) {
-      inputPriceValue.setCustomValidity(ErrorText.PALACE_MIN_PRICE);
-    } else if (inputPrice > 1000000) {
-      inputPriceValue.setCustomValidity(ErrorText.OVERPRICE);
-    } else {
-      inputPriceValue.setCustomValidity('');
-    }
-  });
-
-  //  Синхронизация плейсхолдера с типом жилья
+  //  Синхронизация плейсхолдера с типом жилья и минимальной цены
   inputTypeValue.addEventListener('change', function () {
     if (inputTypeValue.value === 'bungalo') {
-      inputPriceValue.placeholder = HousingTypeToPrice.BUNGALO;
+      inputPriceValue.placeholder = MinPriceHouses.BUNGALO;
+      inputPriceValue.min = MinPriceHouses.BUNGALO;
     } else if (inputTypeValue.value === 'flat') {
-      inputPriceValue.placeholder = HousingTypeToPrice.FLAT;
+      inputPriceValue.placeholder = MinPriceHouses.FLAT;
+      inputPriceValue.min = MinPriceHouses.FLAT;
     } else if (inputTypeValue.value === 'house') {
-      inputPriceValue.placeholder = HousingTypeToPrice.HOUSE;
+      inputPriceValue.placeholder = MinPriceHouses.HOUSE;
+      inputPriceValue.min = MinPriceHouses.HOUSE;
     } else if (inputTypeValue.value === 'palace') {
-      inputPriceValue.placeholder = HousingTypeToPrice.PALACE;
+      inputPriceValue.placeholder = MinPriceHouses.PALACE;
+      inputPriceValue.min = MinPriceHouses.PALACE;
     }
   });
 
@@ -345,5 +292,7 @@
     adFormDisabled: adFormDisabled,
     mapPinMain: mapPinMain,
     mapFiltersContainer: mapFiltersContainer,
+    adForm: adForm,
+    inputPriceValue: inputPriceValue,
   };
 })();
