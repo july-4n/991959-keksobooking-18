@@ -55,7 +55,7 @@
     };
 
     var onPopupEscPress = function (evt) {
-      if (evt.keyCode === window.map.ESC_KEYCODE) {
+      if (window.utils.isEsc(evt)) {
         removePopup();
       }
     };
@@ -87,7 +87,7 @@
 
   var onError = function (status) {
     var errorMessage;
-    if (ErrorCodes.SERVER > status >= ErrorCodes.CLIENT) {
+    if (status >= ErrorCodes.CLIENT && status < ErrorCodes.SERVER) {
       errorMessage = ErrorText.CLIENT + status;
     } else if (status >= ErrorCodes.SERVER) {
       errorMessage = ErrorText.SERVER + status;

@@ -29,11 +29,6 @@
     });
   };
 
-  var hidePopup = function () {
-    var popup = document.querySelector('.popup');
-    popup.classList.add('visually-hidden');
-  };
-
   var activatePins = function () {
     window.backend.sendRequest(successHandler);
   };
@@ -42,6 +37,5 @@
     activatePins: activatePins,
     renderPin: renderPin,
     removeAllPins: removeAllPins,
-    hidePopup: hidePopup
   };
 })();
