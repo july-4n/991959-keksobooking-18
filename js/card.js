@@ -5,6 +5,13 @@
     WIDTH: 45,
     HEIGHT: 40
   };
+  // Объект для маппинга
+  var HOUSE_TYPE = {
+    bungalo: 'Бунгало',
+    flat: 'Квартира',
+    house: 'Дом',
+    palace: 'Дворец'
+  };
 
   var cardTemplate = document.querySelector('#card')
     .content
@@ -32,7 +39,7 @@
     cardElement.querySelector('.popup__title').textContent = pin.offer.title;
     cardElement.querySelector('.popup__text--address').textContent = pin.offer.address;
     cardElement.querySelector('.popup__text--price').textContent = pin.offer.price + ' ₽/ночь';
-    cardElement.querySelector('.popup__type').textContent = pin.offer.type;
+    cardElement.querySelector('.popup__type').textContent = HOUSE_TYPE[pin.offer.type];
     cardElement.querySelector('.popup__text--capacity').textContent = pin.offer.rooms + ' комнаты для ' + pin.offer.guests + ' гостей';
     cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + pin.offer.checkin + ', выезд до ' + pin.offer.checkout;
     cardElement.querySelector('.popup__avatar').src = pin.author.avatar;
