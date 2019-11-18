@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var photo = {
+  var Photo = {
     WIDTH: 45,
     HEIGHT: 40
   };
@@ -17,8 +17,8 @@
       var img = document.createElement('img');
       img.classList.add('popup__photo');
       img.src = pin.offer.photos[i];
-      img.width = photo.WIDTH;
-      img.height = photo.HEIGHT;
+      img.width = Photo.WIDTH;
+      img.height = Photo.HEIGHT;
       img.alt = 'Фото интерьера';
       fragment.appendChild(img);
     }
@@ -36,22 +36,22 @@
     cardElement.querySelector('.popup__text--capacity').textContent = pin.offer.rooms + ' комнаты для ' + pin.offer.guests + ' гостей';
     cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + pin.offer.checkin + ', выезд до ' + pin.offer.checkout;
     cardElement.querySelector('.popup__avatar').src = pin.author.avatar;
-    if (Array.from(pin.offer.description).length !== 0) {
+    if (pin.offer.description) {
       cardElement.querySelector('.popup__description').textContent = pin.offer.description;
     } else {
       cardElement.removeChild(cardElement.querySelector('.popup__description'));
     }
-    if (Array.from(pin.offer.photos).length !== 0) {
+    if (pin.offer.photos && pin.offer.photos.length) {
       renderPhotos(cardElement.querySelector('.popup__photos'), pin);
     } else {
       cardElement.removeChild(cardElement.querySelector('.popup__photos'));
     }
-    cardElement.querySelector('.popup__features').innerHTML = '';
-    if (Array.from(pin.offer.features).length !== 0) {
-      pin.offer.features.forEach(function (element) {
+    window.utils.removeElements(cardElement.querySelector('.popup__features'));
+    if (pin.offer.features && pin.offer.features.length) {
+      pin.offer.features.forEach(function (feature) {
         var newFeatureElement = document.createElement('li');
         newFeatureElement.classList.add('popup__feature');
-        newFeatureElement.classList.add('popup__feature--' + element);
+        newFeatureElement.classList.add('popup__feature--' + feature);
         featuresElement.append(newFeatureElement);
       });
     } else {
@@ -61,6 +61,6 @@
   };
 
   window.card = {
-    renderCardElement: renderCardElement
+    render: renderCardElement
   };
 })();
