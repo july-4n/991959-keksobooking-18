@@ -57,8 +57,8 @@
     // записываем весь массив в переменную чтоб можно было рисовать и удалять карточки
     var fragment = document.createDocumentFragment();
     var slicedPins = pins.slice(0, QUANTITY);
-    for (var i = 0; i < slicedPins.length; i++) {
-      var pin = slicedPins[i];
+
+    slicedPins.forEach(function (pin) {
       var element = document.createElement('div');
       element.classList.add('pin');
       var pinClickHandler = createClickPinHandler(pin);
@@ -66,7 +66,7 @@
       var renderedPin = window.pin.renderPin(pin);
       element.appendChild(renderedPin);
       fragment.appendChild(element);
-    }
+    });
     mapTop.appendChild(fragment);
   };
 

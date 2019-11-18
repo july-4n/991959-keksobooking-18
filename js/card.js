@@ -13,15 +13,15 @@
   //  Функция для отрисовки фотографий
   var renderPhotos = function (photosElement, pin) {
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < pin.offer.photos.length; i++) {
+    pin.offer.photos.forEach(function (photo) {
       var img = document.createElement('img');
       img.classList.add('popup__photo');
-      img.src = pin.offer.photos[i];
+      img.src = photo;
       img.width = Photo.WIDTH;
       img.height = Photo.HEIGHT;
       img.alt = 'Фото интерьера';
       fragment.appendChild(img);
-    }
+    });
     photosElement.appendChild(fragment);
   };
 

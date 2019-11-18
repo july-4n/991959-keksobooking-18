@@ -10,8 +10,8 @@
   //  создаем пин
   var renderPin = function (pin) {
     var element = similarPinTemplate.cloneNode(true);
-    element.style.left = pin.location.x - window.form.PIN_WIDTH / 2 + 'px';
-    element.style.top = pin.location.y - window.form.PIN_HEIGHT + 'px';
+    element.style.left = window.form.getLeft(pin.location.x) + 'px';
+    element.style.top = window.form.getTop(pin.location.y) + 'px';
     element.querySelector('img').src = pin.author.avatar;
     element.querySelector('img').alt = pin.offer.title;
     element.classList.remove('visually-hidden');

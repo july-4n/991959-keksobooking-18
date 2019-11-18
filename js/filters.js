@@ -42,11 +42,12 @@
   };
 
   var getHouseFeatures = function (element) {
-    return Array.prototype.filter.call(houseFeatures, function (el) {
-      return el.checked;
-    }).map(function (el) {
-      return el.value;
-    }).every(function (feature) {
+    return Array.prototype.reduce.call(houseFeatures, function (elements, el) {
+      if (el.checked) {
+        elements.push(el.value);
+      }
+      return elements;
+    }, []).every(function (feature) {
       return element.offer.features.includes(feature);
     });
   };

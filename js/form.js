@@ -84,9 +84,9 @@
   };
 
   var disableElements = function (children, isDisabled) {
-    for (var i = 0; i < children.length; i++) {
-      children[i].disabled = isDisabled;
-    }
+    children.forEach(function (child) {
+      child.disabled = isDisabled;
+    });
   };
 
   //  Добавляем/убираем атрибут disabled в форму
@@ -154,6 +154,14 @@
     address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT / 2));
   };
 
+  var getLeft = function (x) {
+    return x - PIN_WIDTH / 2;
+  };
+
+  var getTop = function (y) {
+    return y - PIN_HEIGHT;
+  };
+
   //  Перетаскивание
   mapPinMain.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
@@ -192,15 +200,15 @@
       coordsPin();
 
       //  Ограничения размеров
-      if (pinCoords.x < X_MIN - PIN_WIDTH / 2) {
-        pinCoords.x = mapOverlay.offsetLeft - PIN_WIDTH / 2;
-      } else if (pinCoords.x > X_MAX - PIN_WIDTH / 2) {
-        pinCoords.x = mapOverlay.offsetLeft + X_MAX - PIN_WIDTH / 2;
+      if (pinCoords.x < getLeft(X_MIN)) {
+        pinCoords.x = getLeft(mapOverlay.offsetLeft);
+      } else if (pinCoords.x > getLeft(X_MAX)) {
+        pinCoords.x = mapOverlay.offsetLeft + getLeft(X_MAX);
       }
-      if (pinCoords.y < Y_MIN - PIN_HEIGHT - PIN_HEIGHT_POINTER) {
-        pinCoords.y = Y_MIN - PIN_HEIGHT - PIN_HEIGHT_POINTER;
-      } else if (pinCoords.y > Y_MAX - PIN_HEIGHT - PIN_HEIGHT_POINTER) {
-        pinCoords.y = mapOverlay.offsetTop + Y_MAX - PIN_HEIGHT - PIN_HEIGHT_POINTER;
+      if (pinCoords.y < getTop(Y_MIN) - PIN_HEIGHT_POINTER) {
+        pinCoords.y = getTop(Y_MIN) - PIN_HEIGHT_POINTER;
+      } else if (pinCoords.y > getTop(Y_MAX) - PIN_HEIGHT_POINTER) {
+        pinCoords.y = mapOverlay.offsetTop + getTop(Y_MAX) - PIN_HEIGHT_POINTER;
       }
       mapPinMain.style.left = (pinCoords.x) + 'px';
       mapPinMain.style.top = (pinCoords.y) + 'px';
@@ -287,8 +295,8 @@
   });
 
   window.form = {
-    PIN_WIDTH: PIN_WIDTH,
-    PIN_HEIGHT: PIN_HEIGHT,
+    getLeft: getLeft,
+    getTop: getTop,
     adFormDisabled: adFormDisabled,
     mapPinMain: mapPinMain,
     mapFiltersContainer: mapFiltersContainer,
