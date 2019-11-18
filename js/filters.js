@@ -1,21 +1,20 @@
 'use strict';
 
 (function () {
-  var QUANTITY = 5;
-  var filtersForm = document.querySelector('.map__filters');
-  var housingTypeSelect = filtersForm.querySelector('#housing-type');
-  var housingPriceSelect = filtersForm.querySelector('#housing-price');
-  var roomsQuantity = filtersForm.querySelector('#housing-rooms');
-  var guestsQuantity = filtersForm.querySelector('#housing-guests');
-  var houseFeatures = filtersForm.querySelector('#housing-features').querySelectorAll('input');
 
-  var priceSize = {
+  var PriceSize = {
     MIN: 10000,
     LOW: 'low',
     MID: 'middle',
     HIGH: 'high',
     MAX: 50000
   };
+  var filtersForm = document.querySelector('.map__filters');
+  var housingTypeSelect = filtersForm.querySelector('#housing-type');
+  var housingPriceSelect = filtersForm.querySelector('#housing-price');
+  var roomsQuantity = filtersForm.querySelector('#housing-rooms');
+  var guestsQuantity = filtersForm.querySelector('#housing-guests');
+  var houseFeatures = filtersForm.querySelector('#housing-features').querySelectorAll('input');
 
   var getHousingType = function (element) {
     if (housingTypeSelect.value === 'any') {
@@ -27,9 +26,9 @@
 
   var gethousingPriceSelect = function (element) {
     switch (housingPriceSelect.value) {
-      case priceSize.LOW: return element.offer.price <= priceSize.MIN;
-      case priceSize.MID: return element.offer.price >= priceSize.MIN && element.offer.price <= priceSize.MAX;
-      case priceSize.HIGH: return element.offer.price >= priceSize.MAX;
+      case PriceSize.LOW: return element.offer.price <= PriceSize.MIN;
+      case PriceSize.MID: return element.offer.price >= PriceSize.MIN && element.offer.price <= PriceSize.MAX;
+      case PriceSize.HIGH: return element.offer.price >= PriceSize.MAX;
       default: return true;
     }
   };
@@ -43,7 +42,7 @@
   };
 
   var getHouseFeatures = function (element) {
-    return Array.from(houseFeatures).filter(function (el) {
+    return Array.prototype.filter.call(houseFeatures, function (el) {
       return el.checked;
     }).map(function (el) {
       return el.value;
@@ -52,11 +51,9 @@
     });
   };
 
-  var selectFilterChangeHandler = window.debounce(function () {
+  var selectFilterChangeHandler = window.utils.debounce(function () {
     window.pin.removeAllPins();
-    if (document.querySelector('.popup') !== null) {
-      window.pin.hidePopup();
-    }
+    window.map.removeCard();
     window.map.renderPins(window.filters.allFilter(window.pinsArray));
   });
 
@@ -71,8 +68,7 @@
   var allFilter = function (data) {
     return data.filter(function (el) {
       return getHousingType(el) && gethousingPriceSelect(el) && getRoomsQuantity(el) && getGuestsQuantity(el) && getHouseFeatures(el);
-    })
-      .slice(0, QUANTITY);
+    });
   };
 
   filtersForm.addEventListener('change', selectFilterChangeHandler);
