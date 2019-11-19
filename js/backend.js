@@ -18,22 +18,22 @@
     OTHER: 'Ошибка! Код ошибки: '
   };
 
-  var sendRequest = function (onSuccess, data) {
+  var sendRequest = function (processSuccess, data) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
       if (xhr.status === SUCCESS_STATUS) {
-        onSuccess(xhr.response);
+        processSuccess(xhr.response);
       } else {
-        onError(xhr.status);
+        processError(xhr.status);
       }
     });
     xhr.addEventListener('error', function () {
-      onError('Произошла ошибка соединения');
+      processError('Произошла ошибка соединения');
     });
     xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
+      processError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
 
     xhr.timeout = REQUEST_TIMEOUT;
@@ -65,27 +65,27 @@
       removePopup();
     });
 
-    var main = document.querySelector('main');
-    main.insertAdjacentElement('afterbegin', popupMessage);
+    var mainElement = document.querySelector('main');
+    mainElement.insertAdjacentElement('afterbegin', popupMessage);
   };
 
   var showErrorMessage = function (errorMessage) {
-    var errorTemplate = document.querySelector('#error')
+    var errorTemplateElement = document.querySelector('#error')
       .content
       .querySelector('.error');
-    createMessage(errorTemplate);
-    var errorText = document.querySelector('.error__message');
-    errorText.textContent = errorMessage;
+    createMessage(errorTemplateElement);
+    var errorTextElement = document.querySelector('.error__message');
+    errorTextElement.textContent = errorMessage;
   };
 
   var showSuccessMessage = function () {
-    var successTemplate = document.querySelector('#success')
+    var successTemplateElement = document.querySelector('#success')
       .content
       .querySelector('.success');
-    createMessage(successTemplate);
+    createMessage(successTemplateElement);
   };
 
-  var onError = function (status) {
+  var processError = function (status) {
     var errorMessage;
     if (status >= ErrorCodes.CLIENT && status < ErrorCodes.SERVER) {
       errorMessage = ErrorText.CLIENT + status;

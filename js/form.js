@@ -26,21 +26,21 @@
     HEIGHT: 70
   };
 
-  var mapFiltersContainer = document.querySelector('.map__filters-container');
-  var mapFilters = document.querySelector('.map__filters');
-  var adForm = document.querySelector('.ad-form');
-  var address = document.querySelector('#address');
-  var mapPinMain = document.querySelector('.map__pin--main');
-  var mapOverlay = document.querySelector('.map__overlay');
-  var resetButton = document.querySelector('.ad-form__reset');
-  var avatarFileChooser = document.querySelector('#avatar');
-  var avatarPreview = document.querySelector('.ad-form-header__preview img');
-  var photosFileChooser = document.querySelector('#images');
-  var photoPreview = document.querySelector('.ad-form__photo');
+  var mapFiltersContainerElement = document.querySelector('.map__filters-container');
+  var mapFiltersElement = document.querySelector('.map__filters');
+  var adFormElement = document.querySelector('.ad-form');
+  var addressElement = document.querySelector('#address');
+  var mapPinMainElement = document.querySelector('.map__pin--main');
+  var mapOverlayElement = document.querySelector('.map__overlay');
+  var resetButtonElement = document.querySelector('.ad-form__reset');
+  var avatarFileChooserElement = document.querySelector('#avatar');
+  var avatarPreviewElement = document.querySelector('.ad-form-header__preview img');
+  var photosFileChooserElement = document.querySelector('#images');
+  var photoPreviewElement = document.querySelector('.ad-form__photo');
 
   //  Загрузка аватарки
-  avatarFileChooser.addEventListener('change', function () {
-    var file = avatarFileChooser.files[0];
+  avatarFileChooserElement.addEventListener('change', function () {
+    var file = avatarFileChooserElement.files[0];
     if (file) {
       var fileName = file.name.toLowerCase();
 
@@ -51,15 +51,15 @@
     if (matches) {
       var reader = new FileReader();
       reader.addEventListener('load', function () {
-        avatarPreview.src = reader.result;
+        avatarPreviewElement.src = reader.result;
       });
       reader.readAsDataURL(file);
     }
   });
 
   //  Загрузка фотографий
-  photosFileChooser.addEventListener('change', function () {
-    var file = photosFileChooser.files[0];
+  photosFileChooserElement.addEventListener('change', function () {
+    var file = photosFileChooserElement.files[0];
     var fileName = file.name.toLowerCase();
     var matches = FILE_TYPES.some(function (it) {
       return fileName.endsWith(it);
@@ -70,7 +70,7 @@
         var photoElement = document.createElement('img');
         photoElement.width = Image.WIDTH;
         photoElement.height = Image.HEIGHT;
-        photoPreview.appendChild(photoElement);
+        photoPreviewElement.appendChild(photoElement);
         photoElement.src = reader.result;
       });
       reader.readAsDataURL(file);
@@ -78,7 +78,7 @@
   });
 
   //  Функция заполнения поля адреса
-  var addressField = function (pinX, pinY) {
+  var getAddress = function (pinX, pinY) {
     var addressValue = pinX + ', ' + pinY;
     return addressValue;
   };
@@ -90,26 +90,26 @@
   };
 
   //  Добавляем/убираем атрибут disabled в форму
-  var adFormDisabled = function (elem, isDisabled) {
-    var fieldsets = elem.querySelectorAll('fieldset');
-    var selects = elem.querySelectorAll('select');
-    var buttons = elem.querySelectorAll('button');
-    disableElements(fieldsets, isDisabled);
-    disableElements(selects, isDisabled);
-    disableElements(buttons, isDisabled);
+  var disableAdForm = function (elem, isDisabled) {
+    var fieldsetsElement = elem.querySelectorAll('fieldset');
+    var selectsElement = elem.querySelectorAll('select');
+    var buttonsElement = elem.querySelectorAll('button');
+    disableElements(fieldsetsElement, isDisabled);
+    disableElements(selectsElement, isDisabled);
+    disableElements(buttonsElement, isDisabled);
     if (isDisabled) {
-      address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT / 2));
-      adForm.classList.add('ad-form--disabled');
-      mapFilters.classList.add('map__filters--disabled');
+      addressElement.value = getAddress((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT / 2));
+      adFormElement.classList.add('ad-form--disabled');
+      mapFiltersElement.classList.add('map__filters--disabled');
       window.map.element.classList.add('map--faded');
       window.pin.removeAllPins();
       if (document.querySelector('.popup') !== null) {
         window.map.removeCard();
       }
     } else {
-      address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT + PIN_HEIGHT_POINTER));
-      adForm.classList.remove('ad-form--disabled');
-      mapFilters.classList.remove('map__filters--disabled');
+      addressElement.value = getAddress((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT + PIN_HEIGHT_POINTER));
+      adFormElement.classList.remove('ad-form--disabled');
+      mapFiltersElement.classList.remove('map__filters--disabled');
       //  проверка, чтобы запрос на сервер уезжал только при активации формы
       if (elem.querySelector('fieldset').classList.value === 'ad-form-header') {
         window.pin.activatePins();
@@ -117,41 +117,41 @@
     }
   };
 
-  adFormDisabled(adForm, true);
-  adFormDisabled(mapFiltersContainer, true);
+  disableAdForm(adFormElement, true);
+  disableAdForm(mapFiltersContainerElement, true);
 
   //  Функция активации страницы
-  var adFormActivation = function () {
-    adFormDisabled(adForm, false);
-    adFormDisabled(mapFiltersContainer, false);
+  var activateAdForm = function () {
+    disableAdForm(adFormElement, false);
+    disableAdForm(mapFiltersContainerElement, false);
   };
 
   //  Обработчик активации страницы по нажатию на Enter
-  mapPinMain.addEventListener('keydown', function (evt) {
+  mapPinMainElement.addEventListener('keydown', function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
-      adFormActivation();
+      activateAdForm();
       window.map.element.classList.remove('map--faded');
     }
   });
 
-  var onSuccess = function () {
+  var processSendSuccess = function () {
     window.backend.showSuccessMessage();
-    adFormDisabled(adForm, true);
-    adFormDisabled(mapFiltersContainer, true);
-    adForm.reset(adForm, true);
-    window.filters.filtersForm.reset();
+    disableAdForm(adFormElement, true);
+    disableAdForm(mapFiltersContainerElement, true);
+    adFormElement.reset(adFormElement, true);
+    window.filters.filtersFormElement.reset();
     resetMainPin();
   };
 
-  adForm.addEventListener('submit', function (evt) {
+  adFormElement.addEventListener('submit', function (evt) {
     evt.preventDefault();
-    window.backend.sendRequest(onSuccess, new FormData(adForm));
+    window.backend.sendRequest(processSendSuccess, new FormData(adFormElement));
   });
 
   var resetMainPin = function () {
-    mapPinMain.style.left = LOCATION_X_PIN + PIN_WIDTH / 2 + 'px';
-    mapPinMain.style.top = LOCATION_Y_PIN + PIN_HEIGHT / 2 + 'px';
-    address.value = addressField((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT / 2));
+    mapPinMainElement.style.left = LOCATION_X_PIN + PIN_WIDTH / 2 + 'px';
+    mapPinMainElement.style.top = LOCATION_Y_PIN + PIN_HEIGHT / 2 + 'px';
+    addressElement.value = getAddress((LOCATION_X_PIN + PIN_WIDTH / 2), (LOCATION_Y_PIN + PIN_HEIGHT / 2));
   };
 
   var getLeft = function (x) {
@@ -163,7 +163,7 @@
   };
 
   //  Перетаскивание
-  mapPinMain.addEventListener('mousedown', function (evt) {
+  mapPinMainElement.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     var dragged = false;
     var startCoords = {
@@ -172,8 +172,8 @@
     };
 
     var pinCoords = {
-      x: mapPinMain.offsetLeft,
-      y: mapPinMain.offsetTop
+      x: mapPinMainElement.offsetLeft,
+      y: mapPinMainElement.offsetTop
     };
 
     var onMouseMove = function (moveEvt) {
@@ -191,28 +191,28 @@
       };
 
       //  Функция расчета координат пина
-      var coordsPin = function () {
+      var calculatePinCoords = function () {
         pinCoords = {
-          x: mapPinMain.offsetLeft - shift.x,
-          y: mapPinMain.offsetTop - shift.y
+          x: mapPinMainElement.offsetLeft - shift.x,
+          y: mapPinMainElement.offsetTop - shift.y
         };
       };
-      coordsPin();
+      calculatePinCoords();
 
       //  Ограничения размеров
       if (pinCoords.x < getLeft(X_MIN)) {
-        pinCoords.x = getLeft(mapOverlay.offsetLeft);
+        pinCoords.x = getLeft(mapOverlayElement.offsetLeft);
       } else if (pinCoords.x > getLeft(X_MAX)) {
-        pinCoords.x = mapOverlay.offsetLeft + getLeft(X_MAX);
+        pinCoords.x = mapOverlayElement.offsetLeft + getLeft(X_MAX);
       }
       if (pinCoords.y < getTop(Y_MIN) - PIN_HEIGHT_POINTER) {
         pinCoords.y = getTop(Y_MIN) - PIN_HEIGHT_POINTER;
       } else if (pinCoords.y > getTop(Y_MAX) - PIN_HEIGHT_POINTER) {
-        pinCoords.y = mapOverlay.offsetTop + getTop(Y_MAX) - PIN_HEIGHT_POINTER;
+        pinCoords.y = mapOverlayElement.offsetTop + getTop(Y_MAX) - PIN_HEIGHT_POINTER;
       }
-      mapPinMain.style.left = (pinCoords.x) + 'px';
-      mapPinMain.style.top = (pinCoords.y) + 'px';
-      address.value = addressField(pinCoords.x + PIN_WIDTH / 2, pinCoords.y + PIN_HEIGHT + PIN_HEIGHT_POINTER);
+      mapPinMainElement.style.left = (pinCoords.x) + 'px';
+      mapPinMainElement.style.top = (pinCoords.y) + 'px';
+      addressElement.value = getAddress(pinCoords.x + PIN_WIDTH / 2, pinCoords.y + PIN_HEIGHT + PIN_HEIGHT_POINTER);
     };
 
     var onMouseUp = function (upEvt) {
@@ -223,12 +223,12 @@
 
       if (!dragged || dragged && window.map.element.classList.contains('map--faded')) {
         var activateForm = function () {
-          adFormActivation();
+          activateAdForm();
           window.map.element.classList.remove('map--faded');
-          mapPinMain.removeEventListener('click', activateForm);
-          address.value = addressField(pinCoords.x + PIN_WIDTH / 2, pinCoords.y + PIN_HEIGHT + PIN_HEIGHT_POINTER);
+          mapPinMainElement.removeEventListener('click', activateForm);
+          addressElement.value = getAddress(pinCoords.x + PIN_WIDTH / 2, pinCoords.y + PIN_HEIGHT + PIN_HEIGHT_POINTER);
         };
-        mapPinMain.addEventListener('click', activateForm);
+        mapPinMainElement.addEventListener('click', activateForm);
       }
     };
     document.addEventListener('mousemove', onMouseMove);
@@ -237,70 +237,68 @@
 
   //  отработка кнопки ad-form__reset
   //  по клику
-  resetButton.addEventListener('mousedown', function () {
-    adFormDisabled(adForm, true);
-    adFormDisabled(mapFiltersContainer, true);
-    adForm.reset(adForm, true);
-    window.filters.filtersForm.reset();
+  resetButtonElement.addEventListener('mousedown', function () {
+    disableAdForm(adFormElement, true);
+    disableAdForm(mapFiltersContainerElement, true);
+    adFormElement.reset(adFormElement, true);
+    window.filters.filtersFormElement.reset();
     resetMainPin();
   });
 
   //  по нажатию на Enter
-  resetButton.addEventListener('keydown', function (evt) {
+  resetButtonElement.addEventListener('keydown', function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
-      adFormDisabled(adForm, true);
-      adForm.reset();
-      window.filters.filtersForm.reset();
+      disableAdForm(adFormElement, true);
+      adFormElement.reset();
+      window.filters.filtersFormElement.reset();
       resetMainPin();
     }
   });
 
-  var adFormSubmit = adForm.querySelector('.ad-form__submit');
-  adFormSubmit.addEventListener('click', function () {
+  var adFormSubmitElement = adFormElement.querySelector('.ad-form__submit');
+  adFormSubmitElement.addEventListener('click', function () {
     window.validate.validateTitle();
     window.validate.validateRooms();
     window.validate.validatePrice();
   });
 
-  var inputTypeValue = adForm.querySelector('#type');
-  var inputTimeInValue = adForm.querySelector('#timein');
-  var inputTimeOutValue = adForm.querySelector('#timeout');
-  var inputPriceValue = adForm.querySelector('#price');
+  var inputTypeElement = adFormElement.querySelector('#type');
+  var inputTimeInElement = adFormElement.querySelector('#timein');
+  var inputTimeOutElement = adFormElement.querySelector('#timeout');
+  var inputPriceValueElement = adFormElement.querySelector('#price');
 
   //  Синхронизация плейсхолдера с типом жилья и минимальной цены
-  inputTypeValue.addEventListener('change', function () {
-    if (inputTypeValue.value === 'bungalo') {
-      inputPriceValue.placeholder = MinPriceHouses.BUNGALO;
-      inputPriceValue.min = MinPriceHouses.BUNGALO;
-    } else if (inputTypeValue.value === 'flat') {
-      inputPriceValue.placeholder = MinPriceHouses.FLAT;
-      inputPriceValue.min = MinPriceHouses.FLAT;
-    } else if (inputTypeValue.value === 'house') {
-      inputPriceValue.placeholder = MinPriceHouses.HOUSE;
-      inputPriceValue.min = MinPriceHouses.HOUSE;
-    } else if (inputTypeValue.value === 'palace') {
-      inputPriceValue.placeholder = MinPriceHouses.PALACE;
-      inputPriceValue.min = MinPriceHouses.PALACE;
+  inputTypeElement.addEventListener('change', function () {
+    if (inputTypeElement.value === 'bungalo') {
+      inputPriceValueElement.placeholder = MinPriceHouses.BUNGALO;
+      inputPriceValueElement.min = MinPriceHouses.BUNGALO;
+    } else if (inputTypeElement.value === 'flat') {
+      inputPriceValueElement.placeholder = MinPriceHouses.FLAT;
+      inputPriceValueElement.min = MinPriceHouses.FLAT;
+    } else if (inputTypeElement.value === 'house') {
+      inputPriceValueElement.placeholder = MinPriceHouses.HOUSE;
+      inputPriceValueElement.min = MinPriceHouses.HOUSE;
+    } else if (inputTypeElement.value === 'palace') {
+      inputPriceValueElement.placeholder = MinPriceHouses.PALACE;
+      inputPriceValueElement.min = MinPriceHouses.PALACE;
     }
   });
 
   //  Синхронизация времени заезда с временем выезда
-  inputTimeInValue.addEventListener('change', function () {
-    inputTimeOutValue.value = inputTimeInValue.value;
+  inputTimeInElement.addEventListener('change', function () {
+    inputTimeOutElement.value = inputTimeInElement.value;
   });
 
   //  Синхронизация времени выезда с временем заезда
-  inputTimeOutValue.addEventListener('change', function () {
-    inputTimeInValue.value = inputTimeOutValue.value;
+  inputTimeOutElement.addEventListener('change', function () {
+    inputTimeInElement.value = inputTimeOutElement.value;
   });
 
   window.form = {
     getLeft: getLeft,
     getTop: getTop,
-    adFormDisabled: adFormDisabled,
-    mapPinMain: mapPinMain,
-    mapFiltersContainer: mapFiltersContainer,
-    adForm: adForm,
-    inputPriceValue: inputPriceValue,
+    mapFiltersContainerElement: mapFiltersContainerElement,
+    adFormElement: adFormElement,
+    inputPriceValueElement: inputPriceValueElement,
   };
 })();

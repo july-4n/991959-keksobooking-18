@@ -13,7 +13,7 @@
     palace: 'Дворец'
   };
 
-  var cardTemplate = document.querySelector('#card')
+  var cardTemplateElement = document.querySelector('#card')
     .content
     .querySelector('.popup');
 
@@ -34,7 +34,7 @@
 
   //  Отрисовка модального окна с объявлением
   var renderCardElement = function (pin) {
-    var cardElement = cardTemplate.cloneNode(true);
+    var cardElement = cardTemplateElement.cloneNode(true);
     var featuresElement = cardElement.querySelector('.popup__features');
     cardElement.querySelector('.popup__title').textContent = pin.offer.title;
     cardElement.querySelector('.popup__text--address').textContent = pin.offer.address;

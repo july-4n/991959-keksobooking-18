@@ -19,30 +19,30 @@
     MAX: 1000000
   };
 
-  var titleValue = window.form.adForm.querySelector('#title');
-  var guestsValue = window.form.adForm.querySelector('#capacity');
-  var roomsValue = window.form.adForm.querySelector('#room_number');
+  var titleValueElement = window.form.adFormElement.querySelector('#title');
+  var guestsValueElement = window.form.adFormElement.querySelector('#capacity');
+  var roomsValueElement = window.form.adFormElement.querySelector('#room_number');
 
   var validateTitle = function () {
-    var titleLength = titleValue.value.length;
+    var titleLength = titleValueElement.value.length;
     if (titleLength < MIN_TITLE_LENGTH) {
-      titleValue.setCustomValidity(ErrorText.TITLE_IS_TOO_SHORT);
+      titleValueElement.setCustomValidity(ErrorText.TITLE_IS_TOO_SHORT);
     } else {
-      titleValue.setCustomValidity('');
+      titleValueElement.setCustomValidity('');
     }
   };
 
   var validateRooms = function () {
-    var guestsNumber = guestsValue.value;
-    var roomsNumber = roomsValue.value;
+    var guestsNumber = guestsValueElement.value;
+    var roomsNumber = roomsValueElement.value;
     if (roomsNumber === RoomsNumber.MAX && guestsNumber !== RoomsNumber.MIN) {
-      guestsValue.setCustomValidity(ErrorText.NOT_GUESTS);
+      guestsValueElement.setCustomValidity(ErrorText.NOT_GUESTS);
     } else if (guestsNumber === RoomsNumber.MIN && roomsNumber !== RoomsNumber.MAX) {
-      guestsValue.setCustomValidity(ErrorText.VALUE_GUESTS);
+      guestsValueElement.setCustomValidity(ErrorText.VALUE_GUESTS);
     } else if (roomsNumber < guestsNumber) {
-      guestsValue.setCustomValidity(ErrorText.GUESTS);
+      guestsValueElement.setCustomValidity(ErrorText.GUESTS);
     } else {
-      guestsValue.setCustomValidity('');
+      guestsValueElement.setCustomValidity('');
     }
   };
 
