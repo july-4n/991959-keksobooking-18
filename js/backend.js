@@ -48,9 +48,9 @@
   };
 
   var createMessage = function (template) {
-    var popupMessage = template.cloneNode(true);
+    var popupMessageElement = template.cloneNode(true);
     var removePopup = function () {
-      popupMessage.remove();
+      popupMessageElement.remove();
       document.removeEventListener('keydown', onPopupEscPress);
     };
 
@@ -61,12 +61,12 @@
     };
 
     document.addEventListener('keydown', onPopupEscPress);
-    popupMessage.addEventListener('click', function () {
+    popupMessageElement.addEventListener('click', function () {
       removePopup();
     });
 
     var mainElement = document.querySelector('main');
-    mainElement.insertAdjacentElement('afterbegin', popupMessage);
+    mainElement.insertAdjacentElement('afterbegin', popupMessageElement);
   };
 
   var showErrorMessage = function (errorMessage) {

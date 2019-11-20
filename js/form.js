@@ -138,7 +138,7 @@
     window.backend.showSuccessMessage();
     disableAdForm(adFormElement, true);
     disableAdForm(mapFiltersContainerElement, true);
-    adFormElement.reset(adFormElement, true);
+    adFormElement.reset();
     window.filters.filtersFormElement.reset();
     resetMainPin();
   };
@@ -240,7 +240,7 @@
   resetButtonElement.addEventListener('mousedown', function () {
     disableAdForm(adFormElement, true);
     disableAdForm(mapFiltersContainerElement, true);
-    adFormElement.reset(adFormElement, true);
+    adFormElement.reset();
     window.filters.filtersFormElement.reset();
     resetMainPin();
   });
@@ -249,6 +249,7 @@
   resetButtonElement.addEventListener('keydown', function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
       disableAdForm(adFormElement, true);
+      disableAdForm(mapFiltersContainerElement, true);
       adFormElement.reset();
       window.filters.filtersFormElement.reset();
       resetMainPin();

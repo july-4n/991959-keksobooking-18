@@ -47,17 +47,17 @@
   };
 
   var validatePrice = function () {
-    var inputPrice = parseInt(window.form.inputPriceValue.value, 10);
-    var minPrice = parseInt(window.form.inputPriceValue.min, 10);
+    var inputPrice = parseInt(window.form.inputPriceValueElement.value, 10);
+    var minPrice = parseInt(window.form.inputPriceValueElement.min, 10);
 
     if (inputPrice < PriceLimits.MIN) {
-      window.form.inputPriceValue.setCustomValidity(ErrorText.PRICE_IS_BELOW_ZERO);
+      window.form.inputPriceValueElement.setCustomValidity(ErrorText.PRICE_IS_BELOW_ZERO);
     } else if (inputPrice < minPrice) {
-      window.form.inputPriceValue.setCustomValidity('Цена должна быть не менее ' + minPrice + ' р.');
+      window.form.inputPriceValueElement.setCustomValidity('Цена должна быть не менее ' + minPrice + ' р.');
     } else if (inputPrice > PriceLimits.MAX) {
-      window.form.inputPriceValue.setCustomValidity(ErrorText.OVERPRICE);
+      window.form.inputPriceValueElement.setCustomValidity(ErrorText.OVERPRICE);
     } else {
-      window.form.inputPriceValue.setCustomValidity('');
+      window.form.inputPriceValueElement.setCustomValidity('');
     }
   };
 
