@@ -9,23 +9,22 @@
     HIGH: 'high',
     MAX: 50000
   };
-  var filtersForm = document.querySelector('.map__filters');
-  var housingTypeSelect = filtersForm.querySelector('#housing-type');
-  var housingPriceSelect = filtersForm.querySelector('#housing-price');
-  var roomsQuantity = filtersForm.querySelector('#housing-rooms');
-  var guestsQuantity = filtersForm.querySelector('#housing-guests');
-  var houseFeatures = filtersForm.querySelector('#housing-features').querySelectorAll('input');
+  var filtersFormElement = document.querySelector('.map__filters');
+  var housingTypeElement = filtersFormElement.querySelector('#housing-type');
+  var housingPriceElement = filtersFormElement.querySelector('#housing-price');
+  var roomsQuantityElement = filtersFormElement.querySelector('#housing-rooms');
+  var guestsQuantityElement = filtersFormElement.querySelector('#housing-guests');
+  var houseFeaturesElement = filtersFormElement.querySelector('#housing-features').querySelectorAll('input');
 
   var getHousingType = function (element) {
-    if (housingTypeSelect.value === 'any') {
+    if (housingTypeElement.value === 'any') {
       return true;
-    } else {
-      return element.offer.type === housingTypeSelect.value;
     }
+    return element.offer.type === housingTypeElement.value;
   };
 
-  var gethousingPriceSelect = function (element) {
-    switch (housingPriceSelect.value) {
+  var gethousingPrice = function (element) {
+    switch (housingPriceElement.value) {
       case PriceSize.LOW: return element.offer.price <= PriceSize.MIN;
       case PriceSize.MID: return element.offer.price >= PriceSize.MIN && element.offer.price <= PriceSize.MAX;
       case PriceSize.HIGH: return element.offer.price >= PriceSize.MAX;
@@ -34,47 +33,49 @@
   };
 
   var getRoomsQuantity = function (element) {
-    if (roomsQuantity.value === 'any') {
+    if (roomsQuantityElement.value === 'any') {
       return true;
-    } else {
-      return element.offer.rooms === parseInt(roomsQuantity.value, 10);
     }
+    return element.offer.rooms === parseInt(roomsQuantityElement.value, 10);
   };
 
   var getHouseFeatures = function (element) {
-    return Array.prototype.filter.call(houseFeatures, function (el) {
-      return el.checked;
-    }).map(function (el) {
-      return el.value;
-    }).every(function (feature) {
-      return element.offer.features.includes(feature);
-    });
+    // Цикл, а не forEach потому что мы можем его преждевременно прервать
+    for (var i = 0; i < houseFeaturesElement.length; i++) {
+      var feature = houseFeaturesElement[i];
+      if (!feature.checked) {
+        continue;
+      }
+      if (!element.offer.features.includes(feature.value)) {
+        return false;
+      }
+    }
+    return true;
   };
 
-  var selectFilterChangeHandler = window.utils.debounce(function () {
+  var onFilterChange = window.utils.debounce(function () {
     window.pin.removeAllPins();
     window.map.removeCard();
-    window.map.renderPins(window.filters.allFilter(window.pinsArray));
+    window.map.renderPins(window.filters.getAllFilter(window.pinsArray));
   });
 
   var getGuestsQuantity = function (element) {
-    if (guestsQuantity.value === 'any') {
+    if (guestsQuantityElement.value === 'any') {
       return true;
-    } else {
-      return element.offer.guests === parseInt(guestsQuantity.value, 10);
     }
+    return element.offer.guests === parseInt(guestsQuantityElement.value, 10);
   };
 
-  var allFilter = function (data) {
+  var getAllFilter = function (data) {
     return data.filter(function (el) {
-      return getHousingType(el) && gethousingPriceSelect(el) && getRoomsQuantity(el) && getGuestsQuantity(el) && getHouseFeatures(el);
+      return getHousingType(el) && gethousingPrice(el) && getRoomsQuantity(el) && getGuestsQuantity(el) && getHouseFeatures(el);
     });
   };
 
-  filtersForm.addEventListener('change', selectFilterChangeHandler);
+  filtersFormElement.addEventListener('change', onFilterChange);
 
   window.filters = {
-    allFilter: allFilter,
-    filtersForm: filtersForm
+    getAllFilter: getAllFilter,
+    filtersFormElement: filtersFormElement
   };
 })();
